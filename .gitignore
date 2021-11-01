@@ -1,15 +1,8 @@
-# Dependency directories
 node_modules
-
-# build / generate output directories
 dist
-
-# Logs
 logs
 *.log
-
-# eslint cache
 .eslintcache
-
-# dotenv environment variables file
 .env
+*.db
+package-lock.json
