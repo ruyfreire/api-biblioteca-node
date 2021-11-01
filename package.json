@@ -9,9 +9,12 @@
     "start": "ts-node-dev --exit-child src/index.ts",
     "build": "tsc",
     "lint": "eslint --fix src/**/*.ts",
-    "prettier": "prettier --write src/**/*.ts"
+    "prettier": "prettier --write src/**/*.ts",
+    "prisma:studio": "prisma studio",
+    "migrate:dev": "prisma migrate dev"
   },
   "dependencies": {
+    "@prisma/client": "3.3.0",
     "axios": "^0.24.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
@@ -30,7 +33,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.1",
     "prettier": "^2.4.1",
-    "prisma": "^3.3.0",
+    "prisma": "3.3.0",
     "ts-node-dev": "^1.1.8",
     "typescript": "^4.4.4"
   }
