@@ -3,13 +3,26 @@ import {
   PrismaClientValidationError
 } from '@prisma/client/runtime'
 
+interface IMetaError {
+  target: Array<string>
+}
+
+interface IPrismaKnownError extends PrismaClientKnownRequestError {
+  meta: IMetaError
+}
+
 export const handlerErrorsPrisma = (error: any) => {
   if (error instanceof PrismaClientKnownRequestError) {
     if (error.code === 'P2002') {
+      const { meta } = error as IPrismaKnownError
+      const { target = [] } = meta || {}
+
       return {
         code: 'error',
         message: 'Autor já existe',
-        data: error.meta
+        data: {
+          duplicate_fields: target
+        }
       }
     }
 
