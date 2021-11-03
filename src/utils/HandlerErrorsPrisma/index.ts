@@ -23,7 +23,7 @@ export const handlerErrorsPrisma = (error: any) => {
   if (error instanceof PrismaClientValidationError) {
     return {
       code: 'error',
-      message: 'Erro de validação dos campos enviados',
+      message: 'Erro de validação dos campos ao salvar no banco',
       data: error.message
     }
   }
