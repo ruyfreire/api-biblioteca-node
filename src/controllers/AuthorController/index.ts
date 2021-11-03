@@ -8,16 +8,16 @@ import { schemaCreateAuthor } from '../../utils/Validators/authorValidator'
 import { handlerValidationError } from '../../utils/Validators/handlerValidation'
 
 export const createAuthorController = async (req: Request, res: Response) => {
-  const author = req.body as ICreateAuthor
-
-  if (!author) {
-    return res.status(400).json({
-      code: 'error',
-      message: 'author não foi enviado'
-    })
-  }
-
   try {
+    const author = req.body as ICreateAuthor
+
+    if (!author) {
+      return res.status(400).json({
+        code: 'error',
+        message: 'author não foi enviado'
+      })
+    }
+
     await schemaCreateAuthor.validate(author)
 
     const newAuthor = await createAuthorService(author)
@@ -40,7 +40,7 @@ export const createAuthorController = async (req: Request, res: Response) => {
     return res.status(400).json({
       code: 'error',
       message: error.message,
-      data: error.data
+      data: error.data || []
     })
   }
 }
@@ -58,7 +58,7 @@ export const getAllAuthorsController = async (req: Request, res: Response) => {
     return res.status(400).json({
       code: 'error',
       message: error.message,
-      data: error.data
+      data: error.data || []
     })
   }
 }
