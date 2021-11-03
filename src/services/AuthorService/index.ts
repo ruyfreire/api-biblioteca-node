@@ -25,3 +25,19 @@ export const createAuthorService = async (
     throw new Error('Erro para criar novo autor')
   }
 }
+
+export const getAllAuthorsService = async (): Promise<Author[]> => {
+  try {
+    const authors = await prismaClient.author.findMany()
+
+    return authors
+  } catch (error: any) {
+    const errorPrisma = handlerErrorsPrisma(error)
+
+    if (errorPrisma) {
+      throw errorPrisma
+    }
+
+    throw new Error('Erro para buscar lista de autores no banco')
+  }
+}
