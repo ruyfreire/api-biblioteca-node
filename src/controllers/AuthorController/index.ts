@@ -1,7 +1,7 @@
-/* eslint-disable no-unused-vars */
 import { Request, Response } from 'express'
 import {
   createAuthorService,
+  getAllAuthorsService,
   ICreateAuthor
 } from '../../services/AuthorService'
 import { schemaCreateAuthor } from '../../utils/Validators/authorValidator'
@@ -37,6 +37,24 @@ export const createAuthorController = async (req: Request, res: Response) => {
       })
     }
 
+    return res.status(400).json({
+      code: 'error',
+      message: error.message,
+      data: error.data
+    })
+  }
+}
+
+export const getAllAuthorsController = async (req: Request, res: Response) => {
+  try {
+    const authors = await getAllAuthorsService()
+
+    return res.status(200).json({
+      code: 'success',
+      message: 'Listagem com todos os autores',
+      authors
+    })
+  } catch (error: Error | any) {
     return res.status(400).json({
       code: 'error',
       message: error.message,
