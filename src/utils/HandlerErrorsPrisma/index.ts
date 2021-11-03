@@ -19,7 +19,7 @@ export const handlerErrorsPrisma = (error: any) => {
 
       return {
         code: 'error',
-        message: 'Autor já existe',
+        message: 'Dados já existem no banco',
         data: {
           duplicate_fields: target
         }
@@ -28,7 +28,7 @@ export const handlerErrorsPrisma = (error: any) => {
 
     return {
       error: 'error',
-      message: 'Erro para criar novo autor',
+      message: 'Erro na comunicação com banco',
       data: error.message
     }
   }
@@ -36,7 +36,7 @@ export const handlerErrorsPrisma = (error: any) => {
   if (error instanceof PrismaClientValidationError) {
     return {
       code: 'error',
-      message: 'Erro de validação dos campos ao salvar no banco',
+      message: 'Erro de validação dos campos ao comunicar com banco',
       data: error.message
     }
   }
