@@ -3,5 +3,5 @@ import { ICreateAuthor } from '../../services/AuthorService'
 import { GlobalSchema } from './globalSchema'
 
 export const schemaCreateAuthor: SchemaOf<ICreateAuthor> = GlobalSchema.shape({
-  name: string().required()
+  name: string().min(2).max(100).required()
 })
