@@ -3,7 +3,8 @@ import {
   createAuthorService,
   getAllAuthorsService,
   getAuthorByIdService,
-  ICreateAuthor
+  ICreateAuthor,
+  putAuthorService
 } from '../../services/AuthorService'
 import { schemaCreateAuthor } from '../../utils/Validators/authorValidator'
 import { handlerValidationError } from '../../utils/Validators/handlerValidation'
@@ -90,6 +91,45 @@ export const getAuthorByIdController = async (req: Request, res: Response) => {
       author
     })
   } catch (error: Error | any) {
+    return res.status(400).json({
+      code: 'error',
+      message: error.message,
+      data: error.data || []
+    })
+  }
+}
+
+export const putAuthorController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+    const author = req.body as ICreateAuthor
+
+    if (!Number(id)) {
+      return res.status(400).json({
+        code: 'error',
+        message: 'ID inválido'
+      })
+    }
+
+    await schemaCreateAuthor.validate(author)
+
+    const authorUpdated = await putAuthorService(author, Number(id))
+
+    return res.status(201).json({
+      code: 'success',
+      message: 'Autor atualizado com sucesso',
+      author: authorUpdated
+    })
+  } catch (error: Error | any) {
+    const validationError = handlerValidationError(error)
+
+    if (validationError) {
+      return res.status(400).json({
+        code: 'error',
+        ...validationError
+      })
+    }
+
     return res.status(400).json({
       code: 'error',
       message: error.message,
