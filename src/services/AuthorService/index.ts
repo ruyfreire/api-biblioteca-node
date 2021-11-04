@@ -41,3 +41,25 @@ export const getAllAuthorsService = async (): Promise<Author[]> => {
     throw new Error('Erro para buscar lista de autores no banco')
   }
 }
+
+export const getAuthorByIdService = async (
+  id: number
+): Promise<Author | null> => {
+  try {
+    const author = await prismaClient.author.findFirst({
+      where: {
+        id
+      }
+    })
+
+    return author
+  } catch (error) {
+    const errorPrisma = handlerErrorsPrisma(error)
+
+    if (errorPrisma) {
+      throw errorPrisma
+    }
+
+    throw new Error('Erro para buscar ID do autor no banco')
+  }
+}
