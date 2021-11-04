@@ -63,3 +63,27 @@ export const getAuthorByIdService = async (
     throw new Error('Erro para buscar ID do autor no banco')
   }
 }
+
+export const putAuthorService = async (
+  author: ICreateAuthor,
+  id: number
+): Promise<Author> => {
+  try {
+    const authorUpdated = await prismaClient.author.update({
+      where: {
+        id
+      },
+      data: author
+    })
+
+    return authorUpdated
+  } catch (error) {
+    const errorPrisma = handlerErrorsPrisma(error)
+
+    if (errorPrisma) {
+      throw errorPrisma
+    }
+
+    throw new Error('Erro para atualizar autor no banco')
+  }
+}
