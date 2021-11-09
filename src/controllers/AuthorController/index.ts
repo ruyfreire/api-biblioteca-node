@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import {
   createAuthorService,
+  deleteAuthorService,
   getAllAuthorsService,
   getAuthorByIdService,
   ICreateAuthor,
@@ -134,6 +135,41 @@ export const putAuthorController = async (req: Request, res: Response) => {
       code: 'error',
       message: error.message,
       data: error.data || []
+    })
+  }
+}
+
+export const deleteAuthorController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params
+
+    if (!Number(id)) {
+      return res.status(400).json({
+        code: 'error',
+        message: 'ID inválido'
+      })
+    }
+
+    const authorDeleted = await deleteAuthorService(Number(id))
+
+    return res.status(201).json({
+      code: 'success',
+      message: 'Autor deletado com sucesso',
+      author: authorDeleted
+    })
+  } catch (error: Error | any) {
+    if (error.status) {
+      return res.status(error.status).json({
+        code: error.code,
+        message: error.message,
+        data: error.data || ''
+      })
+    }
+
+    return res.status(500).json({
+      code: 'error',
+      message: error.message,
+      data: error.data || ''
     })
   }
 }
