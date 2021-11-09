@@ -34,16 +34,20 @@ export const createAuthorController = async (req: Request, res: Response) => {
     const validationError = handlerValidationError(error)
 
     if (validationError) {
-      return res.status(400).json({
-        code: 'error',
-        ...validationError
+      return res.status(400).json(validationError)
+    }
+
+    if (error.status) {
+      return res.status(error.status).json({
+        code: error.code,
+        message: error.message,
+        data: error.data || ''
       })
     }
 
-    return res.status(400).json({
+    return res.status(500).json({
       code: 'error',
-      message: error.message,
-      data: error.data || []
+      message: error.message
     })
   }
 }
@@ -58,10 +62,17 @@ export const getAllAuthorsController = async (req: Request, res: Response) => {
       authors
     })
   } catch (error: Error | any) {
-    return res.status(400).json({
+    if (error.status) {
+      return res.status(error.status).json({
+        code: error.code,
+        message: error.message,
+        data: error.data || ''
+      })
+    }
+
+    return res.status(500).json({
       code: 'error',
-      message: error.message,
-      data: error.data || []
+      message: error.message
     })
   }
 }
@@ -92,10 +103,17 @@ export const getAuthorByIdController = async (req: Request, res: Response) => {
       author
     })
   } catch (error: Error | any) {
-    return res.status(400).json({
+    if (error.status) {
+      return res.status(error.status).json({
+        code: error.code,
+        message: error.message,
+        data: error.data || ''
+      })
+    }
+
+    return res.status(500).json({
       code: 'error',
-      message: error.message,
-      data: error.data || []
+      message: error.message
     })
   }
 }
@@ -125,16 +143,20 @@ export const putAuthorController = async (req: Request, res: Response) => {
     const validationError = handlerValidationError(error)
 
     if (validationError) {
-      return res.status(400).json({
-        code: 'error',
-        ...validationError
+      return res.status(400).json(validationError)
+    }
+
+    if (error.status) {
+      return res.status(error.status).json({
+        code: error.code,
+        message: error.message,
+        data: error.data || ''
       })
     }
 
-    return res.status(400).json({
+    return res.status(500).json({
       code: 'error',
-      message: error.message,
-      data: error.data || []
+      message: error.message
     })
   }
 }
@@ -168,8 +190,7 @@ export const deleteAuthorController = async (req: Request, res: Response) => {
 
     return res.status(500).json({
       code: 'error',
-      message: error.message,
-      data: error.data || ''
+      message: error.message
     })
   }
 }
