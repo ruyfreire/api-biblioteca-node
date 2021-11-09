@@ -101,10 +101,7 @@ export const deleteAuthorService = async (id: number): Promise<Author> => {
     const errorPrisma = handlerErrorsPrisma(error)
 
     if (errorPrisma) {
-      throw {
-        status: 404,
-        ...errorPrisma
-      }
+      throw errorPrisma
     }
 
     throw new Error('Erro para deletar autor no banco')
