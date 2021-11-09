@@ -17,6 +17,7 @@ export const handlerErrorsPrisma = (error: any) => {
       const { target = [] } = meta || {}
 
       return {
+        status: 400,
         code: 'error',
         message: 'Dados já existem no banco',
         data: {
@@ -31,6 +32,7 @@ export const handlerErrorsPrisma = (error: any) => {
       const { cause = '' } = meta || {}
 
       return {
+        status: 404,
         code: 'error',
         message: 'Um ou mais registros nao foram encontrados no banco',
         data: cause
@@ -38,6 +40,7 @@ export const handlerErrorsPrisma = (error: any) => {
     }
 
     return {
+      status: 500,
       error: 'error',
       message: 'Erro na comunicação com banco',
       data: error.message
@@ -46,6 +49,7 @@ export const handlerErrorsPrisma = (error: any) => {
 
   if (error instanceof Prisma.PrismaClientValidationError) {
     return {
+      status: 500,
       code: 'error',
       message: 'Erro de validação dos campos ao comunicar com banco',
       data: error.message
