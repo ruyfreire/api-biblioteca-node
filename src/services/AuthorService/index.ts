@@ -87,3 +87,26 @@ export const putAuthorService = async (
     throw new Error('Erro para atualizar autor no banco')
   }
 }
+
+export const deleteAuthorService = async (id: number): Promise<Author> => {
+  try {
+    const authorDeleted = await prismaClient.author.delete({
+      where: {
+        id
+      }
+    })
+
+    return authorDeleted
+  } catch (error) {
+    const errorPrisma = handlerErrorsPrisma(error)
+
+    if (errorPrisma) {
+      throw {
+        status: 404,
+        ...errorPrisma
+      }
+    }
+
+    throw new Error('Erro para deletar autor no banco')
+  }
+}
