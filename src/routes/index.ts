@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   createAuthorController,
+  deleteAuthorController,
   getAllAuthorsController,
   getAuthorByIdController,
   putAuthorController
@@ -18,5 +19,7 @@ Routes.get('/author', getAllAuthorsController)
 Routes.get('/author/:id', getAuthorByIdController)
 
 Routes.put('/author/:id', putAuthorController)
+
+Routes.delete('/author/:id', deleteAuthorController)
 
 export { Routes }
