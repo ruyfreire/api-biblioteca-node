@@ -6,20 +6,19 @@ import {
   getAuthorByIdController,
   putAuthorController
 } from '../controllers/AuthorController'
-import { HomeController } from '../controllers/HomeController'
+import { notFoundController } from '../controllers/NotFoundController'
 
 const Routes = Router()
 
-Routes.get('/', HomeController)
+Routes.route('/author')
+  .get(getAllAuthorsController)
+  .post(createAuthorController)
 
-Routes.post('/author', createAuthorController)
+Routes.route('/author/:id')
+  .get(getAuthorByIdController)
+  .put(putAuthorController)
+  .delete(deleteAuthorController)
 
-Routes.get('/author', getAllAuthorsController)
-
-Routes.get('/author/:id', getAuthorByIdController)
-
-Routes.put('/author/:id', putAuthorController)
-
-Routes.delete('/author/:id', deleteAuthorController)
+Routes.all('*', notFoundController)
 
 export { Routes }
