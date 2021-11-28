@@ -27,6 +27,7 @@ Routes.route('/book')
 Routes.route('/book/:id')
   .get(new BookController().getById)
   .put(new BookController().update)
+  .delete(new BookController().delete)
 
 Routes.all('*', notFoundController)
 

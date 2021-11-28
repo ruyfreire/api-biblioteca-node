@@ -82,4 +82,24 @@ export class BookService {
       throw new Error('Erro para atualizar livro no banco')
     }
   }
+
+  async delete(id: number): Promise<Book> {
+    try {
+      const deletedBook = await prismaClient.book.delete({
+        where: {
+          id
+        }
+      })
+
+      return deletedBook
+    } catch (error) {
+      const errorPrisma = handlerErrorsPrisma(error)
+
+      if (errorPrisma) {
+        throw errorPrisma
+      }
+
+      throw new Error('Erro para deletar livro do banco')
+    }
+  }
 }

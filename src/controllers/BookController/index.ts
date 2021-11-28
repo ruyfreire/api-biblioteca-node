@@ -33,6 +33,12 @@ export class BookController {
         })
       }
 
+      return res.status(500).json({
+        code: 'error',
+        message: error.message
+      })
+    }
+  }
 
   async getAll(req: Request, res: Response) {
     try {
@@ -145,6 +151,35 @@ export class BookController {
       })
     }
   }
+
+  async delete(req: Request, res: Response) {
+    try {
+      const { id } = req.params
+
+      if (!Number(id)) {
+        return res.status(400).json({
+          code: 'error',
+          message: 'ID inválido'
+        })
+      }
+
+      const serviceBook = new BookService()
+      const deletedBook = await serviceBook.delete(Number(id))
+
+      return res.status(200).json({
+        code: 'success',
+        message: 'Livro deletado com sucesso',
+        book: deletedBook
+      })
+    } catch (error: Error | any) {
+      if (error.status) {
+        return res.status(error.status).json({
+          code: error.code,
+          message: error.message,
+          data: error.data || ''
+        })
+      }
+
       return res.status(500).json({
         code: 'error',
         message: error.message
