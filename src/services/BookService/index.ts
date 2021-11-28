@@ -61,4 +61,25 @@ export class BookService {
       throw new Error('Erro para buscar livro no banco')
     }
   }
+
+  async update(id: number, book: ICreateBook): Promise<Book> {
+    try {
+      const updatedBook = await prismaClient.book.update({
+        where: {
+          id
+        },
+        data: book
+      })
+
+      return updatedBook
+    } catch (error) {
+      const errorPrisma = handlerErrorsPrisma(error)
+
+      if (errorPrisma) {
+        throw errorPrisma
+      }
+
+      throw new Error('Erro para atualizar livro no banco')
+    }
+  }
 }

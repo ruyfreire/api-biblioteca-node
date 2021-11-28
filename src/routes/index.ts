@@ -26,6 +26,7 @@ Routes.route('/book')
 
 Routes.route('/book/:id')
   .get(new BookController().getById)
+  .put(new BookController().update)
 
 Routes.all('*', notFoundController)
 
