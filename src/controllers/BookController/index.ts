@@ -33,6 +33,32 @@ export class BookController {
         })
       }
 
+
+  async getAll(req: Request, res: Response) {
+    try {
+      const serviceBook = new BookService()
+      const books = await serviceBook.getAll()
+
+      return res.status(200).json({
+        code: 'success',
+        message: 'Listagem com todos os livros',
+        books
+      })
+    } catch (error: Error | any) {
+      if (error.status) {
+        return res.status(error.status).json({
+          code: error.code,
+          message: error.message,
+          data: error.data || ''
+        })
+      }
+
+      return res.status(500).json({
+        code: 'error',
+        message: error.message
+      })
+    }
+  }
       return res.status(500).json({
         code: 'error',
         message: error.message

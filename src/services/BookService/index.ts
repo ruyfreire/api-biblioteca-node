@@ -25,4 +25,20 @@ export class BookService {
       throw new Error('Erro para criar novo livro')
     }
   }
+
+  async getAll(): Promise<Book[]> {
+    try {
+      const books = await prismaClient.book.findMany()
+
+      return books
+    } catch (error) {
+      const errorPrisma = handlerErrorsPrisma(error)
+
+      if (errorPrisma) {
+        throw errorPrisma
+      }
+
+      throw new Error('Erro para buscar lista de livros no banco')
+    }
+  }
 }
