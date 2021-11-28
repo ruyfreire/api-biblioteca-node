@@ -13,6 +13,7 @@ API de biblioteca desenvolvida em NodeJS para fins de estudo, usando as ferramen
 - Typescript
 - Axios
 - Prisma
+- Yup
 - ESlint
 - Prettier
 
