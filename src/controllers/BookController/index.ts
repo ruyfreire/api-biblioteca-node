@@ -59,6 +59,48 @@ export class BookController {
       })
     }
   }
+
+  async getById(req: Request, res: Response) {
+    try {
+      const { id } = req.params
+
+      if (!Number(id)) {
+        return res.status(400).json({
+          code: 'error',
+          message: 'ID inválido'
+        })
+      }
+
+      const serviceBook = new BookService()
+      const book = await serviceBook.getById(Number(id))
+
+      if (!book) {
+        return res.status(404).json({
+          code: 'error',
+          message: 'Livro não encontrado'
+        })
+      }
+
+      return res.status(200).json({
+        code: 'success',
+        message: 'Livro encontrado com sucesso',
+        book
+      })
+    } catch (error: Error | any) {
+      if (error.status) {
+        return res.status(error.status).json({
+          code: error.code,
+          message: error.message,
+          data: error.data || ''
+        })
+      }
+
+      return res.status(500).json({
+        code: 'error',
+        message: error.message
+      })
+    }
+  }
       return res.status(500).json({
         code: 'error',
         message: error.message

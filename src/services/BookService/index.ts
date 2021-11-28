@@ -41,4 +41,24 @@ export class BookService {
       throw new Error('Erro para buscar lista de livros no banco')
     }
   }
+
+  async getById(id: number): Promise<Book | null> {
+    try {
+      const book = await prismaClient.book.findFirst({
+        where: {
+          id
+        }
+      })
+
+      return book
+    } catch (error) {
+      const errorPrisma = handlerErrorsPrisma(error)
+
+      if (errorPrisma) {
+        throw errorPrisma
+      }
+
+      throw new Error('Erro para buscar livro no banco')
+    }
+  }
 }

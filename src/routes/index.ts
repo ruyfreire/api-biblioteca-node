@@ -24,6 +24,9 @@ Routes.route('/book')
   .post(new BookController().create)
   .get(new BookController().getAll)
 
+Routes.route('/book/:id')
+  .get(new BookController().getById)
+
 Routes.all('*', notFoundController)
 
 export { Routes }
