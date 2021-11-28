@@ -16,3 +16,11 @@ model Author {
 
   @@map("authors")
 }
+
+model Book {
+  id      Int    @id @default(autoincrement())
+  name    String @unique
+  summary String
+
+  @@map("books")
+}

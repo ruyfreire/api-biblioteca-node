@@ -12,6 +12,7 @@
   "plugins": ["@typescript-eslint"],
   "rules": {
     "camelcase": "off",
-    "no-throw-literal": "off"
+    "no-throw-literal": "off",
+    "space-before-function-paren": "off"
   }
 }

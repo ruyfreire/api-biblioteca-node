@@ -6,6 +6,7 @@ import {
   getAuthorByIdController,
   putAuthorController
 } from '../controllers/AuthorController'
+import { BookController } from '../controllers/BookController'
 import { notFoundController } from '../controllers/NotFoundController'
 
 const Routes = Router()
@@ -19,6 +20,8 @@ Routes.route('/author/:id')
   .put(putAuthorController)
   .delete(deleteAuthorController)
 
+Routes.route('/book')
+  .post(new BookController().create)
 Routes.all('*', notFoundController)
 
 export { Routes }
