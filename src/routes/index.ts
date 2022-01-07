@@ -6,7 +6,13 @@ import {
   getAuthorByIdController,
   putAuthorController
 } from '../controllers/AuthorController'
-import { BookController } from '../controllers/BookController'
+import {
+  createBookController,
+  getAllBookController,
+  getByIdBookController,
+  updateBookController,
+  deleteBookController
+} from '../controllers/BookController'
 import { notFoundController } from '../controllers/NotFoundController'
 
 const Routes = Router()
@@ -21,13 +27,13 @@ Routes.route('/author/:id')
   .delete(deleteAuthorController)
 
 Routes.route('/book')
-  .post(new BookController().create)
-  .get(new BookController().getAll)
+  .post((req, res) => createBookController.execute(req, res))
+  .get((req, res) => getAllBookController.execute(req, res))
 
 Routes.route('/book/:id')
-  .get(new BookController().getById)
-  .put(new BookController().update)
-  .delete(new BookController().delete)
+  .get((req, res) => getByIdBookController.execute(req, res))
+  .put((req, res) => updateBookController.execute(req, res))
+  .delete((req, res) => deleteBookController.execute(req, res))
 
 Routes.all('*', notFoundController)
 
