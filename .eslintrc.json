@@ -13,6 +13,7 @@
   "rules": {
     "camelcase": "off",
     "no-throw-literal": "off",
-    "space-before-function-paren": "off"
+    "space-before-function-paren": "off",
+    "no-useless-constructor": "off"
   }
 }
