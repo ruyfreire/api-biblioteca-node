@@ -10,7 +10,7 @@ export class GetByIdBookController {
 
       if (!Number(id)) {
         return res.status(400).json({
-          code: 'error',
+          code: 'error.validation',
           message: 'ID inválido'
         })
       }
@@ -19,7 +19,7 @@ export class GetByIdBookController {
 
       if (!book) {
         return res.status(404).json({
-          code: 'error',
+          code: 'error.notFound',
           message: 'Livro não encontrado'
         })
       }
@@ -39,7 +39,7 @@ export class GetByIdBookController {
       }
 
       return res.status(500).json({
-        code: 'error',
+        code: 'error.internal',
         message: error.message
       })
     }

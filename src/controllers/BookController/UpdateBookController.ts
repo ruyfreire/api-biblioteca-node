@@ -13,7 +13,7 @@ export class UpdateBookController {
 
       if (!Number(id)) {
         return res.status(400).json({
-          code: 'error',
+          code: 'error.validation',
           message: 'ID inválido'
         })
       }
@@ -43,7 +43,7 @@ export class UpdateBookController {
       }
 
       return res.status(500).json({
-        code: 'error',
+        code: 'error.internal',
         message: error.message
       })
     }

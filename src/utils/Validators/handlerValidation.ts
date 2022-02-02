@@ -3,7 +3,7 @@ import { ValidationError } from 'yup'
 export const handlerValidationError = (error: any) => {
   if (error instanceof ValidationError) {
     return {
-      code: 'error',
+      code: 'error.validation',
       message: 'Erro de validação dos campos',
       data: error.errors
     }

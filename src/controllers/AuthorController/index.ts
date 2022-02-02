@@ -16,7 +16,7 @@ export const createAuthorController = async (req: Request, res: Response) => {
 
     if (!author) {
       return res.status(400).json({
-        code: 'error',
+        code: 'error.validation',
         message: 'author não foi enviado'
       })
     }
@@ -46,7 +46,7 @@ export const createAuthorController = async (req: Request, res: Response) => {
     }
 
     return res.status(500).json({
-      code: 'error',
+      code: 'error.internal',
       message: error.message
     })
   }
@@ -71,7 +71,7 @@ export const getAllAuthorsController = async (req: Request, res: Response) => {
     }
 
     return res.status(500).json({
-      code: 'error',
+      code: 'error.internal',
       message: error.message
     })
   }
@@ -83,7 +83,7 @@ export const getAuthorByIdController = async (req: Request, res: Response) => {
 
     if (!Number(id)) {
       return res.status(400).json({
-        code: 'error',
+        code: 'error.validation',
         message: 'ID inválido'
       })
     }
@@ -92,7 +92,7 @@ export const getAuthorByIdController = async (req: Request, res: Response) => {
 
     if (!author) {
       return res.status(404).json({
-        code: 'error',
+        code: 'error.notFound',
         message: 'Autor não encontrado'
       })
     }
@@ -112,7 +112,7 @@ export const getAuthorByIdController = async (req: Request, res: Response) => {
     }
 
     return res.status(500).json({
-      code: 'error',
+      code: 'error.internal',
       message: error.message
     })
   }
@@ -125,7 +125,7 @@ export const putAuthorController = async (req: Request, res: Response) => {
 
     if (!Number(id)) {
       return res.status(400).json({
-        code: 'error',
+        code: 'error.validation',
         message: 'ID inválido'
       })
     }
@@ -155,7 +155,7 @@ export const putAuthorController = async (req: Request, res: Response) => {
     }
 
     return res.status(500).json({
-      code: 'error',
+      code: 'error.internal',
       message: error.message
     })
   }
@@ -167,7 +167,7 @@ export const deleteAuthorController = async (req: Request, res: Response) => {
 
     if (!Number(id)) {
       return res.status(400).json({
-        code: 'error',
+        code: 'error.validation',
         message: 'ID inválido'
       })
     }
@@ -189,7 +189,7 @@ export const deleteAuthorController = async (req: Request, res: Response) => {
     }
 
     return res.status(500).json({
-      code: 'error',
+      code: 'error.internal',
       message: error.message
     })
   }

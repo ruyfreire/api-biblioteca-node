@@ -23,7 +23,7 @@ export class GetAllBookController {
       }
 
       return res.status(500).json({
-        code: 'error',
+        code: 'error.internal',
         message: error.message
       })
     }
