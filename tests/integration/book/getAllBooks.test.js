@@ -67,7 +67,7 @@ describe('Test integration: Get all Books', () => {
 
       const response = await agent.get('/book').expect(500)
 
-      expect(response.body.code).toBe('error.internal')
+      expect(response.body.code).toBe('error.database.internal')
       expect(response.body.message).toBe('Erro na comunicação com banco')
     })
 

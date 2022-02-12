@@ -78,7 +78,7 @@ describe('Test integration: Create Book', () => {
 
       const response = await agent.post('/book').send(book).expect(400)
 
-      expect(response.body.code).toBe('error.validation')
+      expect(response.body.code).toBe('error.database.unique')
       expect(response.body.message).toBe('Dados já existem no banco')
       expect(response.body.data).toEqual({ duplicate_fields: ['name'] })
     })

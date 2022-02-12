@@ -69,7 +69,7 @@ describe('Test integration: Delete book', () => {
 
       const response = await agent.delete(`/book/${bookId}`).expect(404)
 
-      expect(response.body.code).toBe('error.notFound')
+      expect(response.body.code).toBe('error.database.notFound')
       expect(response.body.message).toBe(
         'Um ou mais registros nao foram encontrados no banco'
       )
