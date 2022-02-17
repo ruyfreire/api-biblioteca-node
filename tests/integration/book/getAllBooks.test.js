@@ -6,19 +6,6 @@ import { Prisma } from '@prisma/client'
 let app
 let agent
 
-jest.mock('../../../src/prisma', () => {
-  const original = jest.requireActual('../../../src/prisma')
-
-  return {
-    prismaClient: {
-      book: {
-        ...original.prismaClient.book,
-        findMany: jest.fn()
-      }
-    }
-  }
-})
-
 describe('Test integration: Get all Books', () => {
   beforeAll(() => {
     app = new Server().start()
@@ -26,8 +13,7 @@ describe('Test integration: Get all Books', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    prismaClient.book.findMany.mockClear()
+    jest.restoreAllMocks()
   })
 
   afterAll(() => {
@@ -41,38 +27,27 @@ describe('Test integration: Get all Books', () => {
         summary: 'Summary book'
       }
 
-      await prismaClient.book.create({
-        data: book
-      })
-
-      prismaClient.book.findMany.mockImplementation((args) => {
-        const original = jest.requireActual('../../../src/prisma')
-
-        return original.prismaClient.book.findMany(args)
-      })
+      await prismaClient.book.create({ data: book })
 
       const response = await agent.get('/book').expect(200)
 
-      expect(response.body.data.toString()).toContain(String(book))
+      expect(response.body.data[0]).toMatchObject(book)
     })
   })
 
   describe('Error cases', () => {
     it('500, Should return internal error database', async () => {
       const errorPrisma = new Prisma.PrismaClientKnownRequestError()
-
-      prismaClient.book.findMany.mockImplementation(() =>
-        Promise.reject(errorPrisma)
-      )
-
+      jest.spyOn(prismaClient.book, 'findMany').mockImplementation(() => Promise.reject(errorPrisma))
+      
       const response = await agent.get('/book').expect(500)
-
+      
       expect(response.body.code).toBe('error.database.internal')
       expect(response.body.message).toBe('Erro na comunicação com banco')
     })
-
+    
     it('500, Should return internal error', async () => {
-      prismaClient.book.findMany.mockImplementation(() => Promise.reject())
+      jest.spyOn(prismaClient.book, 'findMany').mockImplementation(() => Promise.reject())
 
       const response = await agent.get('/book').expect(500)
 
