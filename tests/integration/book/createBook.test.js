@@ -1,20 +1,9 @@
 import request from 'supertest'
 import { Server } from '../../../src/server'
 import { prismaClient } from '../../../src/prisma'
-import { Prisma } from '@prisma/client'
 
 let app
 let agent
-
-jest.mock('../../../src/prisma', () => {
-  return {
-    prismaClient: {
-      book: {
-        create: jest.fn()
-      }
-    }
-  }
-})
 
 describe('Test integration: Create Book', () => {
   beforeAll(() => {
@@ -23,8 +12,7 @@ describe('Test integration: Create Book', () => {
   })
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    prismaClient.book.create.mockClear()
+    jest.restoreAllMocks()
   })
 
   afterAll(() => {
@@ -38,13 +26,9 @@ describe('Test integration: Create Book', () => {
         summary: 'Summary book'
       }
 
-      prismaClient.book.create.mockImplementation(({ data }) =>
-        Promise.resolve(data)
-      )
-
       const response = await agent.post('/book').send(book).expect(201)
 
-      expect(response.body.data).toEqual(book)
+      expect(response.body.data).toMatchObject(book)
     })
   })
 
@@ -65,32 +49,23 @@ describe('Test integration: Create Book', () => {
         name: 'Repeat book name',
         summary: 'Summary book'
       }
-
-      const errorPrisma = new Prisma.PrismaClientKnownRequestError()
-      errorPrisma.code = 'P2002'
-      errorPrisma.meta = {
-        target: ['name']
-      }
-
-      prismaClient.book.create.mockImplementation(() =>
-        Promise.reject(errorPrisma)
-      )
-
+      
+      await prismaClient.book.create({ data: book })
       const response = await agent.post('/book').send(book).expect(400)
-
+      
       expect(response.body.code).toBe('error.database.unique')
       expect(response.body.message).toBe('Dados já existem no banco')
       expect(response.body.data).toEqual({ duplicate_fields: ['name'] })
     })
-
+    
     it('500, Should return internal error', async () => {
       const book = {
         name: 'Book name',
         summary: 'Summary book'
       }
-
-      prismaClient.book.create.mockImplementation(() => Promise.reject())
-
+      
+      jest.spyOn(prismaClient.book, 'create').mockImplementation(() => Promise.reject())
+      
       const response = await agent.post('/book').send(book).expect(500)
 
       expect(response.body.code).toBe('error.internal')
