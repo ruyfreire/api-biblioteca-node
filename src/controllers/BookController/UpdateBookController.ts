@@ -22,7 +22,7 @@ export class UpdateBookController {
 
       const updatedBook = await this.service.update(Number(id), book)
 
-      return res.status(201).json({
+      return res.status(200).json({
         code: 'success',
         message: 'Livro atualizado com sucesso',
         data: updatedBook
