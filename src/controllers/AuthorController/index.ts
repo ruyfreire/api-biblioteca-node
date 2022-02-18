@@ -14,13 +14,6 @@ export const createAuthorController = async (req: Request, res: Response) => {
   try {
     const author = req.body as ICreateAuthor
 
-    if (!author) {
-      return res.status(400).json({
-        code: 'error.validation',
-        message: 'author não foi enviado'
-      })
-    }
-
     await schemaCreateAuthor.validate(author)
 
     const newAuthor = await createAuthorService(author)
@@ -28,7 +21,7 @@ export const createAuthorController = async (req: Request, res: Response) => {
     return res.status(201).json({
       code: 'success',
       message: 'Autor criado com sucesso',
-      author: newAuthor
+      data: newAuthor
     })
   } catch (error: Error | any) {
     const validationError = handlerValidationError(error)
@@ -41,7 +34,7 @@ export const createAuthorController = async (req: Request, res: Response) => {
       return res.status(error.status).json({
         code: error.code,
         message: error.message,
-        data: error.data || ''
+        data: error.data
       })
     }
 
@@ -59,14 +52,14 @@ export const getAllAuthorsController = async (req: Request, res: Response) => {
     return res.status(200).json({
       code: 'success',
       message: 'Listagem com todos os autores',
-      authors
+      data: authors
     })
   } catch (error: Error | any) {
     if (error.status) {
       return res.status(error.status).json({
         code: error.code,
         message: error.message,
-        data: error.data || ''
+        data: error.data
       })
     }
 
@@ -100,14 +93,14 @@ export const getAuthorByIdController = async (req: Request, res: Response) => {
     return res.status(200).json({
       code: 'success',
       message: 'Autor encontrado',
-      author
+      data: author
     })
   } catch (error: Error | any) {
     if (error.status) {
       return res.status(error.status).json({
         code: error.code,
         message: error.message,
-        data: error.data || ''
+        data: error.data
       })
     }
 
@@ -134,10 +127,10 @@ export const putAuthorController = async (req: Request, res: Response) => {
 
     const authorUpdated = await putAuthorService(author, Number(id))
 
-    return res.status(201).json({
+    return res.status(200).json({
       code: 'success',
       message: 'Autor atualizado com sucesso',
-      author: authorUpdated
+      data: authorUpdated
     })
   } catch (error: Error | any) {
     const validationError = handlerValidationError(error)
@@ -150,7 +143,7 @@ export const putAuthorController = async (req: Request, res: Response) => {
       return res.status(error.status).json({
         code: error.code,
         message: error.message,
-        data: error.data || ''
+        data: error.data
       })
     }
 
@@ -172,19 +165,18 @@ export const deleteAuthorController = async (req: Request, res: Response) => {
       })
     }
 
-    const authorDeleted = await deleteAuthorService(Number(id))
+    await deleteAuthorService(Number(id))
 
-    return res.status(201).json({
+    return res.status(200).json({
       code: 'success',
-      message: 'Autor deletado com sucesso',
-      author: authorDeleted
+      message: 'Autor deletado com sucesso'
     })
   } catch (error: Error | any) {
     if (error.status) {
       return res.status(error.status).json({
         code: error.code,
         message: error.message,
-        data: error.data || ''
+        data: error.data
       })
     }
 
