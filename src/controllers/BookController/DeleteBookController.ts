@@ -15,19 +15,18 @@ export class DeleteBookController {
         })
       }
 
-      const deletedBook = await this.service.delete(Number(id))
+      await this.service.delete(Number(id))
 
       return res.status(200).json({
         code: 'success',
-        message: 'Livro deletado com sucesso',
-        book: deletedBook
+        message: 'Livro deletado com sucesso'
       })
     } catch (error: Error | any) {
       if (error.status) {
         return res.status(error.status).json({
           code: error.code,
           message: error.message,
-          data: error.data || ''
+          data: error.data
         })
       }
 

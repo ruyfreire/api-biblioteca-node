@@ -34,7 +34,7 @@ export class GetByIdBookController {
         return res.status(error.status).json({
           code: error.code,
           message: error.message,
-          data: error.data || ''
+          data: error.data
         })
       }
 
