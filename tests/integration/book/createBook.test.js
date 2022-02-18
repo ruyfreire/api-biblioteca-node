@@ -41,7 +41,7 @@ describe('Test integration: Create Book', () => {
       const response = await agent.post('/book').send(book).expect(400)
 
       expect(response.body.message).toBe('Erro de validação dos campos')
-      expect(response.body.data).toEqual(['O campo [summary] é obrigatório'])
+      expect(response.body.data).toContain('O campo [summary] é obrigatório')
     })
 
     it('400, Should return already existing book', async () => {
