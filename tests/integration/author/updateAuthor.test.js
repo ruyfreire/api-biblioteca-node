@@ -22,14 +22,17 @@ describe('Test integration: Update Author', () => {
   describe('Success cases', () => {
     it('200, Should update author success', async () => {
       const author = {
-        name: 'Author name',
+        name: 'Author name'
       }
       const updateAuthor = {
-        name: 'Author updated',
+        name: 'Author updated'
       }
 
       const createdAuthor = await prismaClient.author.create({ data: author })
-      const response = await agent.put(`/author/${createdAuthor.id}`).send(updateAuthor).expect(200)
+      const response = await agent
+        .put(`/author/${createdAuthor.id}`)
+        .send(updateAuthor)
+        .expect(200)
 
       expect(response.body.message).toBe('Autor atualizado com sucesso')
       expect(response.body.data).toMatchObject(updateAuthor)
@@ -49,27 +52,31 @@ describe('Test integration: Update Author', () => {
       const response = await agent.put('/author/99').send(author).expect(400)
 
       expect(response.body.message).toBe('Erro de validação dos campos')
-      expect(response.body.data).toContain('O campo [name] é obrigatório')
+      expect(response.body.data).toContain('Campo obrigatório: name')
     })
 
     it('400, Should return author not found', async () => {
       const author = {
-        name: 'Author name',
+        name: 'Author name'
       }
-      
+
       const response = await agent.put('/author/99').send(author).expect(404)
-      
+
       expect(response.body.code).toBe('error.database.notFound')
-      expect(response.body.message).toBe('Um ou mais registros nao foram encontrados no banco')
+      expect(response.body.message).toBe(
+        'Um ou mais registros nao foram encontrados no banco'
+      )
     })
-    
+
     it('500, Should return internal error', async () => {
       const author = {
-        name: 'Author name',
+        name: 'Author name'
       }
-      
-      jest.spyOn(prismaClient.author, 'update').mockImplementation(() => Promise.reject())
-      
+
+      jest
+        .spyOn(prismaClient.author, 'update')
+        .mockImplementation(() => Promise.reject())
+
       const response = await agent.put('/author/99').send(author).expect(500)
 
       expect(response.body.code).toBe('error.internal')

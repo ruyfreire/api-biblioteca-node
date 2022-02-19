@@ -38,29 +38,31 @@ describe('Test integration: Create Author', () => {
 
       expect(response.body.code).toBe('error.validation')
       expect(response.body.message).toBe('Erro de validação dos campos')
-      expect(response.body.data).toContain('O campo [name] é obrigatório')
+      expect(response.body.data).toContain('Campo obrigatório: name')
     })
 
     it('400, Should return already existing author', async () => {
       const author = {
         name: 'Repeat Author name'
       }
-      
+
       await prismaClient.author.create({ data: author })
       const response = await agent.post('/author').send(author).expect(400)
-      
+
       expect(response.body.code).toBe('error.database.unique')
       expect(response.body.message).toBe('Dados já existem no banco')
       expect(response.body.data).toEqual({ duplicate_fields: ['name'] })
     })
-    
+
     it('500, Should return internal error', async () => {
       const author = {
         name: 'Author name'
       }
-      
-      jest.spyOn(prismaClient.author, 'create').mockImplementation(() => Promise.reject())
-      
+
+      jest
+        .spyOn(prismaClient.author, 'create')
+        .mockImplementation(() => Promise.reject())
+
       const response = await agent.post('/author').send(author).expect(500)
 
       expect(response.body.code).toBe('error.internal')
