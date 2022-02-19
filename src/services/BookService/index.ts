@@ -1,25 +1,101 @@
-import { Book } from '.prisma/client'
+import { Book, Author } from '.prisma/client'
 import { prismaClient } from '../../prisma'
 import { handlerErrorsPrisma } from '../../utils/HandlerErrorsPrisma'
 
 export interface ICreateBook {
   name: string
   summary: string
+  authors?: number[]
+}
+
+export interface IBookCreated extends Book {
+  authors: Author[]
 }
 
 export class BookService {
-  async create(book: ICreateBook): Promise<Book> {
+  async create(book: ICreateBook): Promise<IBookCreated> {
     try {
-      const newBook = await prismaClient.book.create({
-        data: book
+      const authorList = book?.authors || []
+
+      if (authorList.length === 0) {
+        throw {
+          code: 'error.validation',
+          status: 400,
+          message: 'É necessário informar pelo menos um autor',
+          data: null
+        }
+      }
+
+      const authorFoundList: number[] = []
+      const authorNotFound: number[] = []
+      await new Promise((resolve, reject) => {
+        authorList.forEach((authorId) => {
+          prismaClient.author
+            .findFirst({
+              where: {
+                id: authorId
+              },
+              select: {
+                id: true
+              }
+            })
+            .then((author) => {
+              if (author) {
+                authorFoundList.push(author.id)
+              } else {
+                authorNotFound.push(authorId)
+              }
+            })
+            .catch(reject)
+            .finally(() => resolve(true))
+        })
       })
 
-      return newBook
-    } catch (error) {
-      const errorPrisma = handlerErrorsPrisma(error)
+      if (authorNotFound.length > 0) {
+        throw {
+          code: 'error.notFound',
+          status: 400,
+          message: 'Um ou mais autores não foram encontrados',
+          data: authorNotFound
+        }
+      }
 
-      if (errorPrisma) {
-        throw errorPrisma
+      const newAuthorsList = authorFoundList.map((currentAuthor) => ({
+        author: {
+          connect: {
+            id: currentAuthor
+          }
+        }
+      }))
+
+      const newBook = await prismaClient.book.create({
+        data: {
+          name: book.name,
+          summary: book.summary,
+          authors: {
+            create: newAuthorsList
+          }
+        },
+        include: {
+          authors: {
+            select: {
+              author: true
+            }
+          }
+        }
+      })
+
+      const bookResponse = {
+        ...newBook,
+        authors: newBook.authors.map((current) => current.author)
+      }
+
+      return bookResponse
+    } catch (error: any) {
+      const errorBuilder = handlerErrorsPrisma(error)
+
+      if (errorBuilder.status) {
+        throw errorBuilder
       }
 
       throw new Error('Erro para criar novo livro')
