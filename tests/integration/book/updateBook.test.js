@@ -21,17 +21,36 @@ describe('Test integration: Update Book', () => {
 
   describe('Success cases', () => {
     it('200, Should update book success', async () => {
-      const book = {
-        name: 'Book name',
-        summary: 'Summary book'
-      }
+      const createdBook = await prismaClient.book.create({
+        data: {
+          name: 'Book name',
+          summary: 'Book summary',
+          authors: {
+            create: {
+              author: {
+                create: { name: 'Author Repeat name' }
+              }
+            }
+          }
+        },
+        include: {
+          authors: {
+            select: {
+              authorId: true
+            }
+          }
+        }
+      })
+
       const updateBook = {
-        name: 'Book updated',
-        summary: 'Summary book updated'
+        name: 'Book updated name',
+        summary: 'Book updated summary'
       }
 
-      const createdBook = await prismaClient.book.create({ data: book })
-      const response = await agent.put(`/book/${createdBook.id}`).send(updateBook).expect(200)
+      const response = await agent
+        .put(`/book/${createdBook.id}`)
+        .send(updateBook)
+        .expect(200)
 
       expect(response.body.message).toBe('Livro atualizado com sucesso')
       expect(response.body.data).toMatchObject(updateBook)
@@ -53,7 +72,7 @@ describe('Test integration: Update Book', () => {
       const response = await agent.put('/book/1').send(book).expect(400)
 
       expect(response.body.message).toBe('Erro de validação dos campos')
-      expect(response.body.data).toEqual(['O campo [summary] é obrigatório'])
+      expect(response.body.data).toContain('Campo obrigatório: summary')
     })
 
     it('400, Should return book not found', async () => {
@@ -61,21 +80,26 @@ describe('Test integration: Update Book', () => {
         name: 'Book name',
         summary: 'Summary book'
       }
-      
+
       const response = await agent.put('/book/99').send(book).expect(404)
-      
+
       expect(response.body.code).toBe('error.database.notFound')
-      expect(response.body.message).toBe('Um ou mais registros nao foram encontrados no banco')
+      expect(response.body.message).toBe(
+        'Um ou mais registros nao foram encontrados no banco'
+      )
     })
-    
+
     it('500, Should return internal error', async () => {
       const book = {
         name: 'Book name',
-        summary: 'Summary book'
+        summary: 'Summary book',
+        authors: [1]
       }
-      
-      jest.spyOn(prismaClient.book, 'update').mockImplementation(() => Promise.reject())
-      
+
+      jest
+        .spyOn(prismaClient.book, 'update')
+        .mockImplementation(() => Promise.reject())
+
       const response = await agent.put('/book/99').send(book).expect(500)
 
       expect(response.body.code).toBe('error.internal')

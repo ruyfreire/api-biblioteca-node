@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { schemaCreateBook } from '../../utils/Validators/bookValidator'
+import { validatorCreateBook } from '../../utils/Validators/bookValidator'
 import { BookService, ICreateBook } from '../../services/BookService'
 import { handlerValidationError } from '../../utils/Validators/handlerValidation'
 
@@ -18,7 +18,7 @@ export class UpdateBookController {
         })
       }
 
-      await schemaCreateBook.validate(book)
+      await validatorCreateBook(book)
 
       const updatedBook = await this.service.update(Number(id), book)
 
