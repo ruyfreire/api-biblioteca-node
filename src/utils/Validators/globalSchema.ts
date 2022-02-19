@@ -4,7 +4,7 @@ import { object, setLocale } from 'yup'
 setLocale({
   mixed: {
     notType: 'O campo [${path}] precisa ser do tipo [${type}]',
-    required: 'O campo [${path}] é obrigatório'
+    required: 'Campo obrigatório: ${path}'
   },
   object: {
     noUnknown: 'Campos desconhecidos: [${unknown}]'
