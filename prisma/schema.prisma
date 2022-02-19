@@ -14,6 +14,8 @@ model Author {
   id   Int    @id @default(autoincrement())
   name String @unique
 
+  books AuthorAndBook[]
+
   @@map("authors")
 }
 
@@ -22,5 +24,17 @@ model Book {
   name    String @unique
   summary String
 
+  authors AuthorAndBook[]
+
   @@map("books")
+}
+
+model AuthorAndBook {
+  author   Author @relation(fields: [authorId], references: [id])
+  authorId Int
+  book     Book   @relation(fields: [bookId], references: [id])
+  bookId   Int
+
+  @@id([authorId, bookId])
+  @@map("author_book")
 }
