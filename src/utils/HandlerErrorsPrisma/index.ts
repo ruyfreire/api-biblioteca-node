@@ -56,5 +56,5 @@ export const handlerErrorsPrisma = (error: any) => {
     }
   }
 
-  return ''
+  return error
 }
