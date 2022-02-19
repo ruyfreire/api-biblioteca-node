@@ -1,19 +1,14 @@
 import { prismaClient } from '../src/prisma'
+import { createTableQueries, dropTableQueries } from './utils/queries'
 
 beforeAll(async () => {
-  await prismaClient.$queryRaw`CREATE TABLE IF NOT EXISTS main.books (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT UNIQUE,
-      summary TEXT
-      )`
-
-  await prismaClient.$queryRaw`CREATE TABLE IF NOT EXISTS main.authors (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT UNIQUE
-      )`
+  await Promise.all(
+    createTableQueries.map((query) => prismaClient.$queryRaw(query))
+  )
 })
 
 afterAll(async () => {
-  await prismaClient.$queryRaw`DROP TABLE main.books`
-  await prismaClient.$queryRaw`DROP TABLE main.authors`
+  await Promise.all(
+    dropTableQueries.map((query) => prismaClient.$queryRaw(query))
+  )
 })
