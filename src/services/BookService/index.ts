@@ -1,4 +1,4 @@
-import { Book } from '.prisma/client'
+import { Book, Author } from '.prisma/client'
 import { prismaClient } from '../../prisma'
 import { handlerErrorsPrisma } from '../../utils/HandlerErrorsPrisma'
 
@@ -7,6 +7,17 @@ export interface ICreateBook {
   summary: string
   authors: number[]
 }
+
+const formatResponseBook = (
+  books: Book & {
+    authors: {
+      author: Author
+    }[]
+  }
+): Book & { authors: Author[] } => ({
+  ...books,
+  authors: books.authors.map((current) => current.author)
+})
 
 export class BookService {
   async create(book: ICreateBook): Promise<Book> {
@@ -22,37 +33,22 @@ export class BookService {
         }
       }
 
-      const authorFoundList: number[] = []
-      const authorNotFound: number[] = []
-      await new Promise((resolve, reject) => {
-        authorList.forEach((authorId) => {
-          prismaClient.author
-            .findFirst({
-              where: {
-                id: authorId
-              },
-              select: {
-                id: true
-              }
-            })
-            .then((author) => {
-              if (author) {
-                authorFoundList.push(author.id)
-              } else {
-                authorNotFound.push(authorId)
-              }
-            })
-            .catch(reject)
-            .finally(() => resolve(true))
-        })
+      const authorsFound = await prismaClient.author.findMany({
+        where: {
+          id: {
+            in: authorList
+          }
+        }
       })
 
-      if (authorNotFound.length > 0) {
+      if (authorsFound.length !== authorList.length) {
         throw {
           code: 'error.notFound',
           status: 400,
           message: 'Um ou mais autores não foram encontrados',
-          data: authorNotFound
+          data: authorList.filter(
+            (authorId) => !authorsFound.some((author) => author.id === authorId)
+          )
         }
       }
 
@@ -61,7 +57,7 @@ export class BookService {
           name: book.name,
           summary: book.summary,
           authors: {
-            create: authorFoundList.map((authorId) => ({
+            create: authorList.map((authorId) => ({
               author: {
                 connect: {
                   id: authorId
@@ -79,10 +75,7 @@ export class BookService {
         }
       })
 
-      const bookResponse = {
-        ...newBook,
-        authors: newBook.authors.map((current) => current.author)
-      }
+      const bookResponse = formatResponseBook(newBook)
 
       return bookResponse
     } catch (error: any) {
@@ -108,7 +101,9 @@ export class BookService {
         }
       })
 
-      return books
+      const booksResponse = books.map(formatResponseBook)
+
+      return booksResponse
     } catch (error) {
       const errorPrisma = handlerErrorsPrisma(error)
 
@@ -136,10 +131,7 @@ export class BookService {
       })
 
       if (book) {
-        const bookResponse = {
-          ...book,
-          authors: book.authors.map((current) => current.author)
-        }
+        const bookResponse = formatResponseBook(book)
 
         return bookResponse
       }
@@ -166,6 +158,25 @@ export class BookService {
           status: 400,
           message: 'É necessário informar pelo menos um autor',
           data: null
+        }
+      }
+
+      const authorsFound = await prismaClient.author.findMany({
+        where: {
+          id: {
+            in: authorList
+          }
+        }
+      })
+
+      if (authorsFound.length !== authorList.length) {
+        throw {
+          code: 'error.notFound',
+          status: 400,
+          message: 'Um ou mais autores não foram encontrados',
+          data: authorList.filter(
+            (authorId) => !authorsFound.some((author) => author.id === authorId)
+          )
         }
       }
 
@@ -211,10 +222,7 @@ export class BookService {
         }
       })
 
-      const bookResponse = {
-        ...updatedBook,
-        authors: updatedBook.authors.map((current) => current.author)
-      }
+      const bookResponse = formatResponseBook(updatedBook)
 
       return bookResponse
     } catch (error) {
