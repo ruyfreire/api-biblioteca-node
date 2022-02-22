@@ -36,7 +36,7 @@ describe('Test integration: Update Book', () => {
         include: {
           authors: {
             select: {
-              authorId: true
+              author: true
             }
           }
         }
@@ -44,7 +44,13 @@ describe('Test integration: Update Book', () => {
 
       const updateBook = {
         name: 'Book updated name',
-        summary: 'Book updated summary'
+        summary: 'Book updated summary',
+        authors: [createdBook.authors[0].author.id]
+      }
+
+      const updatedResponse = {
+        ...updateBook,
+        authors: [createdBook.authors[0].author]
       }
 
       const response = await agent
@@ -53,7 +59,7 @@ describe('Test integration: Update Book', () => {
         .expect(200)
 
       expect(response.body.message).toBe('Livro atualizado com sucesso')
-      expect(response.body.data).toMatchObject(updateBook)
+      expect(response.body.data).toMatchObject(updatedResponse)
     })
   })
 
@@ -78,7 +84,8 @@ describe('Test integration: Update Book', () => {
     it('400, Should return book not found', async () => {
       const book = {
         name: 'Book name',
-        summary: 'Summary book'
+        summary: 'Summary book',
+        authors: [1]
       }
 
       const response = await agent.put('/book/99').send(book).expect(404)

@@ -1,19 +1,15 @@
-import { Book, Author } from '.prisma/client'
+import { Book } from '.prisma/client'
 import { prismaClient } from '../../prisma'
 import { handlerErrorsPrisma } from '../../utils/HandlerErrorsPrisma'
 
 export interface ICreateBook {
   name: string
   summary: string
-  authors?: number[]
-}
-
-export interface IBookCreated extends Book {
-  authors: Author[]
+  authors: number[]
 }
 
 export class BookService {
-  async create(book: ICreateBook): Promise<IBookCreated> {
+  async create(book: ICreateBook): Promise<Book> {
     try {
       const authorList = book?.authors || []
 
@@ -60,20 +56,18 @@ export class BookService {
         }
       }
 
-      const newAuthorsList = authorFoundList.map((currentAuthor) => ({
-        author: {
-          connect: {
-            id: currentAuthor
-          }
-        }
-      }))
-
       const newBook = await prismaClient.book.create({
         data: {
           name: book.name,
           summary: book.summary,
           authors: {
-            create: newAuthorsList
+            create: authorFoundList.map((authorId) => ({
+              author: {
+                connect: {
+                  id: authorId
+                }
+              }
+            }))
           }
         },
         include: {
@@ -104,7 +98,15 @@ export class BookService {
 
   async getAll(): Promise<Book[]> {
     try {
-      const books = await prismaClient.book.findMany()
+      const books = await prismaClient.book.findMany({
+        include: {
+          authors: {
+            select: {
+              author: true
+            }
+          }
+        }
+      })
 
       return books
     } catch (error) {
@@ -123,8 +125,24 @@ export class BookService {
       const book = await prismaClient.book.findFirst({
         where: {
           id
+        },
+        include: {
+          authors: {
+            select: {
+              author: true
+            }
+          }
         }
       })
+
+      if (book) {
+        const bookResponse = {
+          ...book,
+          authors: book.authors.map((current) => current.author)
+        }
+
+        return bookResponse
+      }
 
       return book
     } catch (error) {
@@ -140,14 +158,65 @@ export class BookService {
 
   async update(id: number, book: ICreateBook): Promise<Book> {
     try {
+      const authorList = book?.authors || []
+
+      if (authorList.length === 0) {
+        throw {
+          code: 'error.validation',
+          status: 400,
+          message: 'É necessário informar pelo menos um autor',
+          data: null
+        }
+      }
+
       const updatedBook = await prismaClient.book.update({
         where: {
           id
         },
-        data: book
+        data: {
+          name: book.name,
+          summary: book.summary,
+          authors: {
+            connectOrCreate: authorList.map((authorId) => ({
+              create: {
+                author: {
+                  connect: {
+                    id: authorId
+                  }
+                }
+              },
+              where: {
+                authorId_bookId: {
+                  bookId: id,
+                  authorId
+                }
+              }
+            })),
+            deleteMany: [
+              {
+                authorId: {
+                  notIn: authorList
+                },
+                bookId: id
+              }
+            ]
+          }
+        },
+        include: {
+          authors: {
+            select: {
+              author: true
+            }
+          }
+        }
       })
 
-      return updatedBook
+      const bookResponse = {
+        ...updatedBook,
+        authors: updatedBook.authors.map((current) => current.author)
+      }
+
+      return bookResponse
     } catch (error) {
       const errorPrisma = handlerErrorsPrisma(error)
 
