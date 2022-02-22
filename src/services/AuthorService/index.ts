@@ -96,6 +96,14 @@ export const deleteAuthorService = async (id: number): Promise<Author> => {
       }
     })
 
+    await prismaClient.book.deleteMany({
+      where: {
+        authors: {
+          none: {}
+        }
+      }
+    })
+
     return authorDeleted
   } catch (error) {
     const errorPrisma = handlerErrorsPrisma(error)
