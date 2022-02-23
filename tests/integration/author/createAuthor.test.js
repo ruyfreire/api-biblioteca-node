@@ -6,8 +6,8 @@ let app
 let agent
 
 describe('Test integration: Create Author', () => {
-  beforeAll(() => {
-    app = new Server().start()
+  beforeAll(async () => {
+    app = await new Server().start()
     agent = request.agent(app)
   })
 

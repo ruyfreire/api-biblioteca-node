@@ -7,8 +7,8 @@ let app
 let agent
 
 describe('Test integration: Get all Books', () => {
-  beforeAll(() => {
-    app = new Server().start()
+  beforeAll(async () => {
+    app = await new Server().start()
     agent = request.agent(app)
   })
 
@@ -38,16 +38,20 @@ describe('Test integration: Get all Books', () => {
   describe('Error cases', () => {
     it('500, Should return internal error database', async () => {
       const errorPrisma = new Prisma.PrismaClientKnownRequestError()
-      jest.spyOn(prismaClient.book, 'findMany').mockImplementation(() => Promise.reject(errorPrisma))
-      
+      jest
+        .spyOn(prismaClient.book, 'findMany')
+        .mockImplementation(() => Promise.reject(errorPrisma))
+
       const response = await agent.get('/book').expect(500)
-      
+
       expect(response.body.code).toBe('error.database.internal')
       expect(response.body.message).toBe('Erro na comunicação com banco')
     })
-    
+
     it('500, Should return internal error', async () => {
-      jest.spyOn(prismaClient.book, 'findMany').mockImplementation(() => Promise.reject())
+      jest
+        .spyOn(prismaClient.book, 'findMany')
+        .mockImplementation(() => Promise.reject())
 
       const response = await agent.get('/book').expect(500)
 

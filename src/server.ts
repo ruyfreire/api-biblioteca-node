@@ -1,16 +1,17 @@
-import express from 'express'
+import express, { Express } from 'express'
+import { Server as httpServer } from 'http'
 import cors from 'cors'
 import { Routes } from './routes'
 
 export class Server {
-  app: express.Application
+  app: Express
   port: number | string
 
-  constructor() {
+  constructor(port?: number | string | undefined) {
     this.app = express()
     this.middlewares()
     this.routes()
-    this.port = process.env.PORT || 3000
+    this.port = port || process.env.PORT || 3000
   }
 
   middlewares() {
@@ -28,9 +29,7 @@ export class Server {
     this.app.use(Routes)
   }
 
-  start() {
-    return this.app.listen(this.port, () => {
-      console.log(`Servidor rodando na porta ${this.port} 🚀`)
-    })
+  start(): Promise<httpServer> {
+    return new Promise((resolve) => resolve(this.app.listen(this.port)))
   }
 }

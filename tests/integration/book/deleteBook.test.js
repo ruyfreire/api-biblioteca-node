@@ -6,8 +6,8 @@ let app
 let agent
 
 describe('Test integration: Delete book', () => {
-  beforeAll(() => {
-    app = new Server().start()
+  beforeAll(async () => {
+    app = await new Server().start()
     agent = request.agent(app)
   })
 
@@ -51,7 +51,9 @@ describe('Test integration: Delete book', () => {
     })
 
     it('500, Should return internal error', async () => {
-      jest.spyOn(prismaClient.book, 'delete').mockImplementation(() => Promise.reject())
+      jest
+        .spyOn(prismaClient.book, 'delete')
+        .mockImplementation(() => Promise.reject())
 
       const response = await agent.delete('/book/99').expect(500)
 
