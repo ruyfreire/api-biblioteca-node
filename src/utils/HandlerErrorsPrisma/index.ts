@@ -43,7 +43,7 @@ export const handlerErrorsPrisma = (error: any) => {
       status: 500,
       code: 'error.database.internal',
       message: 'Erro na comunicação com banco',
-      data: error.message
+      data: null
     }
   }
 
@@ -52,7 +52,7 @@ export const handlerErrorsPrisma = (error: any) => {
       status: 500,
       code: 'error.database.validation',
       message: 'Erro de validação dos campos ao comunicar com banco',
-      data: error.message
+      data: null
     }
   }
 
