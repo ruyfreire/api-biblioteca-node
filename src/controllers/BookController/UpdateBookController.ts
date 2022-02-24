@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { validatorCreateBook } from '../../utils/Validators/bookValidator'
 import { BookService, ICreateBook } from '../../services/BookService'
 import { handlerValidationError } from '../../utils/Validators/handlerValidation'
+import { logger } from '../../utils/Logger'
 
 export class UpdateBookController {
   constructor(private service: BookService) {}
@@ -12,15 +13,23 @@ export class UpdateBookController {
       const book = req.body as ICreateBook
 
       if (!Number(id)) {
-        return res.status(400).json({
+        const error = {
           code: 'error.validation',
           message: 'ID inválido'
-        })
+        }
+
+        logger.error('update book controller | error:', { error })
+
+        return res.status(400).json(error)
       }
 
       await validatorCreateBook(book)
 
       const updatedBook = await this.service.update(Number(id), book)
+
+      logger.info(
+        `update book controller | Livro atualizado com sucesso | ID: ${id}`
+      )
 
       return res.status(200).json({
         code: 'success',
@@ -28,6 +37,8 @@ export class UpdateBookController {
         data: updatedBook
       })
     } catch (error: Error | any) {
+      logger.error('update book controller | error:', { error })
+
       const validationError = handlerValidationError(error)
 
       if (validationError) {

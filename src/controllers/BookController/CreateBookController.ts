@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { validatorCreateBook } from '../../utils/Validators/bookValidator'
 import { BookService, ICreateBook } from '../../services/BookService'
 import { handlerValidationError } from '../../utils/Validators/handlerValidation'
+import { logger } from '../../utils/Logger'
 
 export class CreateBookController {
   constructor(private service: BookService) {}
@@ -14,12 +15,18 @@ export class CreateBookController {
 
       const newBook = await this.service.create(book)
 
+      logger.info(
+        `create book controller | Livro criado com sucesso | ID: ${newBook.id}`
+      )
+
       return res.status(201).json({
         code: 'success',
         message: 'Livro criado com sucesso',
         data: newBook
       })
     } catch (error: Error | any) {
+      logger.error('create book controller | error:', { error })
+
       const validationError = handlerValidationError(error)
 
       if (validationError) {
