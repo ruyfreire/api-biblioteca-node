@@ -1,16 +1,16 @@
-import { Prisma } from '@prisma/client'
+import { prismaClient } from '../../src/prisma'
 
 export const createTableQueries = [
-  Prisma.sql`CREATE TABLE IF NOT EXISTS main.books (
+  prismaClient.$executeRaw`CREATE TABLE IF NOT EXISTS main.books (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE,
         summary TEXT
     )`,
-  Prisma.sql`CREATE TABLE IF NOT EXISTS main.authors (
+  prismaClient.$executeRaw`CREATE TABLE IF NOT EXISTS main.authors (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT UNIQUE
     )`,
-  Prisma.sql`CREATE TABLE IF NOT EXISTS main.author_book (
+  prismaClient.$executeRaw`CREATE TABLE IF NOT EXISTS main.author_book (
         authorId INTEGER NOT NULL,
         bookId INTEGER NOT NULL,
     
@@ -21,7 +21,13 @@ export const createTableQueries = [
 ]
 
 export const dropTableQueries = [
-  Prisma.sql`DROP TABLE IF EXISTS main.author_book`,
-  Prisma.sql`DROP TABLE IF EXISTS main.books`,
-  Prisma.sql`DROP TABLE IF EXISTS main.authors`
+  prismaClient.$executeRaw`DROP TABLE IF EXISTS main.author_book`,
+  prismaClient.$executeRaw`DROP TABLE IF EXISTS main.books`,
+  prismaClient.$executeRaw`DROP TABLE IF EXISTS main.authors`
+]
+
+export const clearTableQueries = [
+  prismaClient.$executeRaw`DELETE FROM main.author_book`,
+  prismaClient.$executeRaw`DELETE FROM main.books`,
+  prismaClient.$executeRaw`DELETE FROM main.authors`
 ]
