@@ -82,10 +82,14 @@ describe('Test integration: Update Book', () => {
     })
 
     it('400, Should return book not found', async () => {
+      const authorCreated = await prismaClient.author.create({
+        data: { name: 'Author name' }
+      })
+
       const book = {
         name: 'Book name',
         summary: 'Summary book',
-        authors: [1]
+        authors: [authorCreated.id]
       }
 
       const response = await agent.put('/book/99').send(book).expect(404)
@@ -97,19 +101,24 @@ describe('Test integration: Update Book', () => {
     })
 
     it('500, Should return internal error', async () => {
+      const authorCreated = await prismaClient.author.create({
+        data: { name: 'Author name' }
+      })
+
       const book = {
         name: 'Book name',
         summary: 'Summary book',
-        authors: [1]
+        authors: [authorCreated.id]
       }
 
       jest
         .spyOn(prismaClient.book, 'update')
-        .mockImplementation(() => Promise.reject())
+        .mockImplementation(() => Promise.reject(new Error('Internal error')))
 
       const response = await agent.put('/book/99').send(book).expect(500)
 
       expect(response.body.code).toBe('error.internal')
+      expect(response.body.message).toBe('Internal error')
     })
   })
 })

@@ -94,15 +94,19 @@ describe('Test integration: Create Book', () => {
     })
 
     it('500, Should return internal error', async () => {
+      const authorCreated = await prismaClient.author.create({
+        data: { name: 'Author name' }
+      })
+
       const book = {
         name: 'Book name',
         summary: 'Summary book',
-        authors: [1]
+        authors: [authorCreated.id]
       }
 
       jest
         .spyOn(prismaClient.book, 'create')
-        .mockImplementation(() => Promise.reject())
+        .mockImplementation(() => Promise.reject(new Error('Internal error')))
 
       const response = await agent.post('/book').send(book).expect(500)
 

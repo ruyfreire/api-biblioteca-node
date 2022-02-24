@@ -54,7 +54,7 @@ describe('Test integration: Delete author', () => {
     it('500, Should return internal error', async () => {
       jest
         .spyOn(prismaClient.author, 'delete')
-        .mockImplementation(() => Promise.reject())
+        .mockImplementation(() => Promise.reject(new Error('Internal error')))
 
       const response = await agent.delete('/author/99').expect(500)
 

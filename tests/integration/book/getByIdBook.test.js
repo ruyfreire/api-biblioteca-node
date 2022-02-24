@@ -66,7 +66,7 @@ describe('Test integration: Get by id Book', () => {
     it('500, Should return internal error', async () => {
       jest
         .spyOn(prismaClient.book, 'findFirst')
-        .mockImplementation(() => Promise.reject())
+        .mockImplementation(() => Promise.reject(new Error('Internal error')))
 
       const response = await agent.get('/book/99').expect(500)
 

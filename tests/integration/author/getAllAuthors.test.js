@@ -52,7 +52,7 @@ describe('Test integration: Get all Authors', () => {
     it('500, Should return internal error', async () => {
       jest
         .spyOn(prismaClient.author, 'findMany')
-        .mockImplementation(() => Promise.reject())
+        .mockImplementation(() => Promise.reject(new Error('Internal error')))
 
       const response = await agent.get('/author').expect(500)
 
