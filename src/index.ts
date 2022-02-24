@@ -12,5 +12,5 @@ server
     logger.debug('----------------------------------------')
   })
   .catch((error) => {
-    logger.error('Start server error: ', error)
+    logger.error('Start server error:', { error })
   })
