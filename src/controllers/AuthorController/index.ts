@@ -20,7 +20,7 @@ export const createAuthorController = async (req: Request, res: Response) => {
     const newAuthor = await createAuthorService(author)
 
     logger.info(
-      `create author | Autor criado com sucesso | ID: ${newAuthor.id}`
+      `create author controller | Autor criado com sucesso | ID: ${newAuthor.id}`
     )
 
     return res.status(201).json({
@@ -29,7 +29,7 @@ export const createAuthorController = async (req: Request, res: Response) => {
       data: newAuthor
     })
   } catch (error: Error | any) {
-    logger.error('create author | error:', { error })
+    logger.error('create author controller | error:', { error })
 
     const validationError = handlerValidationError(error)
 
@@ -56,7 +56,7 @@ export const getAllAuthorsController = async (req: Request, res: Response) => {
   try {
     const authors = await getAllAuthorsService()
 
-    logger.info('get all authors | Autores retornados com sucesso')
+    logger.info('get all authors controller | Autores retornados com sucesso')
 
     return res.status(200).json({
       code: 'success',
@@ -64,7 +64,7 @@ export const getAllAuthorsController = async (req: Request, res: Response) => {
       data: authors
     })
   } catch (error: Error | any) {
-    logger.error('get all authors | error:', { error })
+    logger.error('get all authors controller | error:', { error })
 
     if (error.status) {
       return res.status(error.status).json({
@@ -143,7 +143,7 @@ export const putAuthorController = async (req: Request, res: Response) => {
         message: 'ID inválido'
       }
 
-      logger.error('update author | error:', { error })
+      logger.error('update author controller | error:', { error })
 
       return res.status(400).json(error)
     }
@@ -152,7 +152,9 @@ export const putAuthorController = async (req: Request, res: Response) => {
 
     const authorUpdated = await putAuthorService(author, Number(id))
 
-    logger.info(`update author | Autor atualizado com sucesso | ID: ${id}`)
+    logger.info(
+      `update author controller | Autor atualizado com sucesso | ID: ${id}`
+    )
 
     return res.status(200).json({
       code: 'success',
@@ -160,7 +162,7 @@ export const putAuthorController = async (req: Request, res: Response) => {
       data: authorUpdated
     })
   } catch (error: Error | any) {
-    logger.error('update author | error:', { error })
+    logger.error('update author controller | error:', { error })
 
     const validationError = handlerValidationError(error)
 
@@ -193,21 +195,23 @@ export const deleteAuthorController = async (req: Request, res: Response) => {
         message: 'ID inválido'
       }
 
-      logger.error('delete author | error:', { error })
+      logger.error('delete author controller | error:', { error })
 
       return res.status(400).json(error)
     }
 
     await deleteAuthorService(Number(id))
 
-    logger.info(`delete author | Autor deletado com sucesso | ID: ${id}`)
+    logger.info(
+      `delete author controller | Autor deletado com sucesso | ID: ${id}`
+    )
 
     return res.status(200).json({
       code: 'success',
       message: 'Autor deletado com sucesso'
     })
   } catch (error: Error | any) {
-    logger.error('delete author | error:', { error })
+    logger.error('delete author controller | error:', { error })
 
     if (error.status) {
       return res.status(error.status).json({
