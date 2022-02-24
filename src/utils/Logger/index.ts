@@ -10,7 +10,6 @@ const customFormat = (...formats: Logform.Format[]) =>
   )
 
 const logger = winston.createLogger({
-  silent: process.env.NODE_ENV === 'test',
   transports: [
     new winston.transports.Console({
       level: 'debug',
@@ -28,6 +27,7 @@ const logger = winston.createLogger({
     }),
     new winston.transports.File({
       level: 'error',
+      silent: process.env.NODE_ENV === 'test',
       format: customFormat(
         winston.format.printf(({ level, message, timestamp, ...meta }) => {
           const data = JSON.stringify(meta)
