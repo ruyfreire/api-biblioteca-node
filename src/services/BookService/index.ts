@@ -1,6 +1,7 @@
 import { Book, Author } from '.prisma/client'
 import { prismaClient } from '../../prisma'
 import { handlerErrorsPrisma } from '../../utils/HandlerErrorsPrisma'
+import { logger } from '../../utils/Logger'
 
 export interface ICreateBook {
   name: string
@@ -81,6 +82,8 @@ export class BookService {
     } catch (error: any) {
       const errorBuilder = handlerErrorsPrisma(error)
 
+      logger.error('create book service | error:', { error: errorBuilder })
+
       if (errorBuilder.status) {
         throw errorBuilder
       }
@@ -105,10 +108,12 @@ export class BookService {
 
       return booksResponse
     } catch (error) {
-      const errorPrisma = handlerErrorsPrisma(error)
+      const errorBuilder = handlerErrorsPrisma(error)
 
-      if (errorPrisma) {
-        throw errorPrisma
+      logger.error('get all books service | error:', { error: errorBuilder })
+
+      if (errorBuilder) {
+        throw errorBuilder
       }
 
       throw new Error('Erro para buscar lista de livros no banco')
@@ -138,10 +143,12 @@ export class BookService {
 
       return book
     } catch (error) {
-      const errorPrisma = handlerErrorsPrisma(error)
+      const errorBuilder = handlerErrorsPrisma(error)
 
-      if (errorPrisma) {
-        throw errorPrisma
+      logger.error('get book by id service | error:', { error: errorBuilder })
+
+      if (errorBuilder) {
+        throw errorBuilder
       }
 
       throw new Error('Erro para buscar livro no banco')
@@ -226,10 +233,12 @@ export class BookService {
 
       return bookResponse
     } catch (error) {
-      const errorPrisma = handlerErrorsPrisma(error)
+      const errorBuilder = handlerErrorsPrisma(error)
 
-      if (errorPrisma) {
-        throw errorPrisma
+      logger.error('update book service | error:', { error: errorBuilder })
+
+      if (errorBuilder) {
+        throw errorBuilder
       }
 
       throw new Error('Erro para atualizar livro no banco')
@@ -246,10 +255,12 @@ export class BookService {
 
       return deletedBook
     } catch (error) {
-      const errorPrisma = handlerErrorsPrisma(error)
+      const errorBuilder = handlerErrorsPrisma(error)
 
-      if (errorPrisma) {
-        throw errorPrisma
+      logger.error('delete book service | error:', { error: errorBuilder })
+
+      if (errorBuilder) {
+        throw errorBuilder
       }
 
       throw new Error('Erro para deletar livro do banco')
