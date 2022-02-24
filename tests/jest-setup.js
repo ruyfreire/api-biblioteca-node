@@ -1,9 +1,19 @@
 import { prismaClient } from '../src/prisma'
-import { createTableQueries, dropTableQueries } from './utils/queries'
+import {
+  createTableQueries,
+  dropTableQueries,
+  clearTableQueries
+} from './utils/queries'
 
 beforeAll(async () => {
   await Promise.all(
     createTableQueries.map((query) => prismaClient.$queryRaw(query))
+  )
+})
+
+afterEach(async () => {
+  await Promise.all(
+    clearTableQueries.map((query) => prismaClient.$queryRaw(query))
   )
 })
 
