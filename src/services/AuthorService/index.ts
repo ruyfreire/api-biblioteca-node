@@ -19,7 +19,9 @@ export const createAuthorService = async (
   } catch (error: any) {
     const errorBuilder = handlerErrorsPrisma(error)
 
-    logger.error('create author service | error:', { error: errorBuilder })
+    logger.error('create author service | error:', {
+      error: { ...errorBuilder, originalError: error }
+    })
 
     if (errorBuilder) {
       throw errorBuilder
@@ -37,7 +39,9 @@ export const getAllAuthorsService = async (): Promise<Author[]> => {
   } catch (error: any) {
     const errorBuilder = handlerErrorsPrisma(error)
 
-    logger.error('get all authors service | error:', { error: errorBuilder })
+    logger.error('get all authors service | error:', {
+      error: { ...errorBuilder, originalError: error }
+    })
 
     if (errorBuilder) {
       throw errorBuilder
@@ -61,7 +65,9 @@ export const getAuthorByIdService = async (
   } catch (error) {
     const errorBuilder = handlerErrorsPrisma(error)
 
-    logger.error('get author by id service | error:', { error: errorBuilder })
+    logger.error('get author by id service | error:', {
+      error: { ...errorBuilder, originalError: error }
+    })
 
     if (errorBuilder) {
       throw errorBuilder
@@ -87,7 +93,9 @@ export const putAuthorService = async (
   } catch (error) {
     const errorBuilder = handlerErrorsPrisma(error)
 
-    logger.error('put author service | error:', { error: errorBuilder })
+    logger.error('put author service | error:', {
+      error: { ...errorBuilder, originalError: error }
+    })
 
     if (errorBuilder) {
       throw errorBuilder
@@ -117,7 +125,9 @@ export const deleteAuthorService = async (id: number): Promise<Author> => {
   } catch (error) {
     const errorBuilder = handlerErrorsPrisma(error)
 
-    logger.error('delete author service | error:', { error: errorBuilder })
+    logger.error('delete author service | error:', {
+      error: { ...errorBuilder, originalError: error }
+    })
 
     if (errorBuilder) {
       throw errorBuilder

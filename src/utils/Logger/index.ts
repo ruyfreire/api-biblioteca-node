@@ -30,8 +30,23 @@ const logger = winston.createLogger({
       silent: process.env.NODE_ENV === 'test',
       format: customFormat(
         winston.format.printf(({ level, message, timestamp, ...meta }) => {
-          const data = JSON.stringify(meta)
-          const restMessage = data.length > 2 ? data : ''
+          let originalMessage = meta?.originalError || ''
+          let errorMessage = meta?.error || ''
+
+          if (originalMessage instanceof Error) {
+            originalMessage = originalMessage.message
+          }
+
+          if (errorMessage instanceof Error) {
+            errorMessage = errorMessage.message
+          }
+
+          const restMessage = JSON.stringify({
+            ...meta,
+            error: errorMessage,
+            originalError: originalMessage || errorMessage
+          })
+
           return `${timestamp} [${level}]: ${message} ${restMessage}`.trim()
         })
       ),

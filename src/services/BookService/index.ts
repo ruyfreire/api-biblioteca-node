@@ -82,7 +82,10 @@ export class BookService {
     } catch (error: any) {
       const errorBuilder = handlerErrorsPrisma(error)
 
-      logger.error('create book service | error:', { error: errorBuilder })
+      logger.error('create book service | error:', {
+        error: errorBuilder,
+        originalError: error
+      })
 
       if (errorBuilder.status) {
         throw errorBuilder
@@ -110,7 +113,10 @@ export class BookService {
     } catch (error) {
       const errorBuilder = handlerErrorsPrisma(error)
 
-      logger.error('get all books service | error:', { error: errorBuilder })
+      logger.error('get all books service | error:', {
+        error: errorBuilder,
+        originalError: error
+      })
 
       if (errorBuilder) {
         throw errorBuilder
@@ -145,7 +151,10 @@ export class BookService {
     } catch (error) {
       const errorBuilder = handlerErrorsPrisma(error)
 
-      logger.error('get book by id service | error:', { error: errorBuilder })
+      logger.error('get book by id service | error:', {
+        error: errorBuilder,
+        originalError: error
+      })
 
       if (errorBuilder) {
         throw errorBuilder
@@ -235,7 +244,10 @@ export class BookService {
     } catch (error) {
       const errorBuilder = handlerErrorsPrisma(error)
 
-      logger.error('update book service | error:', { error: errorBuilder })
+      logger.error('update book service | error:', {
+        error: errorBuilder,
+        originalError: error
+      })
 
       if (errorBuilder) {
         throw errorBuilder
@@ -257,7 +269,10 @@ export class BookService {
     } catch (error) {
       const errorBuilder = handlerErrorsPrisma(error)
 
-      logger.error('delete book service | error:', { error: errorBuilder })
+      logger.error('delete book service | error:', {
+        error: errorBuilder,
+        originalError: error
+      })
 
       if (errorBuilder) {
         throw errorBuilder
