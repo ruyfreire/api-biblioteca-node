@@ -93,6 +93,36 @@ describe('Test integration: Create Book', () => {
       expect(response.body.data).toEqual({ duplicate_fields: ['name'] })
     })
 
+    it('400, Should require authors list', async () => {
+      const book = {
+        name: 'Book name',
+        summary: 'Summary book',
+        authors: []
+      }
+
+      const response = await agent.post('/book').send(book).expect(400)
+
+      expect(response.body.code).toBe('error.validation')
+      expect(response.body.message).toBe(
+        'É necessário informar pelo menos um autor'
+      )
+    })
+
+    it('400, Should return author not found', async () => {
+      const book = {
+        name: 'Book name',
+        summary: 'Summary book',
+        authors: [99]
+      }
+
+      const response = await agent.post('/book').send(book).expect(400)
+
+      expect(response.body.code).toBe('error.notFound')
+      expect(response.body.message).toBe(
+        'Um ou mais autores não foram encontrados'
+      )
+    })
+
     it('500, Should return internal error', async () => {
       const authorCreated = await prismaClient.author.create({
         data: { name: 'Author name' }
@@ -106,11 +136,12 @@ describe('Test integration: Create Book', () => {
 
       jest
         .spyOn(prismaClient.book, 'create')
-        .mockImplementation(() => Promise.reject(new Error('Internal error')))
+        .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.post('/book').send(book).expect(500)
 
-      expect(response.body.code).toBe('error.internal')
+      expect(response.body.code).toBe('error.database.internal')
+      expect(response.body.message).toBe('Erro para criar novo livro')
     })
   })
 })

@@ -51,26 +51,15 @@ describe('Test integration: Get by id Book', () => {
       expect(response.body.message).toBe('Livro não encontrado')
     })
 
-    it('500, Should return internal error database', async () => {
-      const errorPrisma = new Prisma.PrismaClientKnownRequestError()
+    it('500, Should return internal error', async () => {
       jest
         .spyOn(prismaClient.book, 'findFirst')
-        .mockImplementation(() => Promise.reject(errorPrisma))
+        .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.get('/book/99').expect(500)
 
       expect(response.body.code).toBe('error.database.internal')
-      expect(response.body.message).toBe('Erro na comunicação com banco')
-    })
-
-    it('500, Should return internal error', async () => {
-      jest
-        .spyOn(prismaClient.book, 'findFirst')
-        .mockImplementation(() => Promise.reject(new Error('Internal error')))
-
-      const response = await agent.get('/book/99').expect(500)
-
-      expect(response.body.code).toBe('error.internal')
+      expect(response.body.message).toBe('Erro para buscar livro no banco')
     })
   })
 })

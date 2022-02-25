@@ -53,11 +53,12 @@ describe('Test integration: Delete book', () => {
     it('500, Should return internal error', async () => {
       jest
         .spyOn(prismaClient.book, 'delete')
-        .mockImplementation(() => Promise.reject(new Error('Internal error')))
+        .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.delete('/book/99').expect(500)
 
-      expect(response.body.code).toBe('error.internal')
+      expect(response.body.code).toBe('error.database.internal')
+      expect(response.body.message).toBe('Erro para deletar livro no banco')
     })
   })
 })
