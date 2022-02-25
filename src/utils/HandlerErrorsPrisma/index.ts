@@ -9,7 +9,7 @@ interface IPrismaKnownError extends Prisma.PrismaClientKnownRequestError {
   meta: IMetaError
 }
 
-export const handlerErrorsPrisma = (error: any) => {
+export const handlerErrorsPrisma = (error: any, defaultError: string) => {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     // P2002: Valor único que nao pode ser alterado
     if (error.code === 'P2002') {
@@ -38,13 +38,6 @@ export const handlerErrorsPrisma = (error: any) => {
         data: cause
       }
     }
-
-    return {
-      status: 500,
-      code: 'error.database.internal',
-      message: 'Erro na comunicação com banco',
-      data: null
-    }
   }
 
   if (error instanceof Prisma.PrismaClientValidationError) {
@@ -56,5 +49,14 @@ export const handlerErrorsPrisma = (error: any) => {
     }
   }
 
-  return { message: error.message }
+  if (error.status) {
+    return error
+  } else {
+    return {
+      status: 500,
+      code: 'error.database.internal',
+      message: defaultError,
+      data: null
+    }
+  }
 }
