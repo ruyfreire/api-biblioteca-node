@@ -80,18 +80,15 @@ export class BookService {
 
       return bookResponse
     } catch (error: any) {
-      const errorBuilder = handlerErrorsPrisma(error)
+      const defaultError = 'Erro para criar novo livro'
+      const errorBuilder = handlerErrorsPrisma(error, defaultError)
 
       logger.error('create book service | error:', {
         error: errorBuilder,
         originalError: error
       })
 
-      if (errorBuilder.status) {
-        throw errorBuilder
-      }
-
-      throw new Error('Erro para criar novo livro')
+      throw errorBuilder
     }
   }
 
@@ -111,18 +108,15 @@ export class BookService {
 
       return booksResponse
     } catch (error) {
-      const errorBuilder = handlerErrorsPrisma(error)
+      const defaultError = 'Erro para buscar lista de livros no banco'
+      const errorBuilder = handlerErrorsPrisma(error, defaultError)
 
       logger.error('get all books service | error:', {
         error: errorBuilder,
         originalError: error
       })
 
-      if (errorBuilder) {
-        throw errorBuilder
-      }
-
-      throw new Error('Erro para buscar lista de livros no banco')
+      throw errorBuilder
     }
   }
 
@@ -149,18 +143,15 @@ export class BookService {
 
       return book
     } catch (error) {
-      const errorBuilder = handlerErrorsPrisma(error)
+      const defaultError = 'Erro para buscar livro no banco'
+      const errorBuilder = handlerErrorsPrisma(error, defaultError)
 
       logger.error('get book by id service | error:', {
         error: errorBuilder,
         originalError: error
       })
 
-      if (errorBuilder) {
-        throw errorBuilder
-      }
-
-      throw new Error('Erro para buscar livro no banco')
+      throw errorBuilder
     }
   }
 
@@ -242,18 +233,15 @@ export class BookService {
 
       return bookResponse
     } catch (error) {
-      const errorBuilder = handlerErrorsPrisma(error)
+      const defaultError = 'Erro para atualizar livro no banco'
+      const errorBuilder = handlerErrorsPrisma(error, defaultError)
 
       logger.error('update book service | error:', {
         error: errorBuilder,
         originalError: error
       })
 
-      if (errorBuilder) {
-        throw errorBuilder
-      }
-
-      throw new Error('Erro para atualizar livro no banco')
+      throw errorBuilder
     }
   }
 
@@ -267,18 +255,15 @@ export class BookService {
 
       return deletedBook
     } catch (error) {
-      const errorBuilder = handlerErrorsPrisma(error)
+      const defaultError = 'Erro para deletar livro no banco'
+      const errorBuilder = handlerErrorsPrisma(error, defaultError)
 
       logger.error('delete book service | error:', {
         error: errorBuilder,
         originalError: error
       })
 
-      if (errorBuilder) {
-        throw errorBuilder
-      }
-
-      throw new Error('Erro para deletar livro do banco')
+      throw errorBuilder
     }
   }
 }
