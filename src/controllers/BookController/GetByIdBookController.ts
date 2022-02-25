@@ -1,6 +1,10 @@
 import { Request, Response } from 'express'
 import { BookService } from '../../services/BookService'
 import { logger } from '../../utils/Logger'
+import {
+  handlerErrorsBuilder,
+  ResponseBuilder
+} from '../../utils/ResponseBuilder'
 
 export class GetByIdBookController {
   constructor(private service: BookService) {}
@@ -10,14 +14,15 @@ export class GetByIdBookController {
       const { id } = req.params
 
       if (!Number(id)) {
-        const error = {
+        const error = new ResponseBuilder({
+          status: 400,
           code: 'error.validation',
           message: 'ID inválido'
-        }
+        })
 
         logger.error('get book by id controller | error:', { error })
 
-        return res.status(400).json(error)
+        return res.status(error.status).json(error)
       }
 
       const book = await this.service.getById(Number(id))
@@ -30,7 +35,7 @@ export class GetByIdBookController {
         return res.status(404).json({
           code: 'error.notFound',
           message: 'Livro não encontrado'
-        })
+        } as ResponseBuilder)
       }
 
       logger.info(
@@ -41,22 +46,16 @@ export class GetByIdBookController {
         code: 'success',
         message: 'Livro encontrado com sucesso',
         data: book
-      })
+      } as ResponseBuilder)
     } catch (error: Error | any) {
-      logger.error('get book by id controller | error:', { error })
+      const errorBuilder = handlerErrorsBuilder(error)
 
-      if (error.status) {
-        return res.status(error.status).json({
-          code: error.code,
-          message: error.message,
-          data: error.data
-        })
-      }
-
-      return res.status(500).json({
-        code: 'error.internal',
-        message: error.message
+      logger.error('get book by id controller | error:', {
+        error: errorBuilder,
+        originalError: error
       })
+
+      return res.status(errorBuilder.status).json(errorBuilder)
     }
   }
 }

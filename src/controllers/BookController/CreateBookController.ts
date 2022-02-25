@@ -3,6 +3,10 @@ import { validatorCreateBook } from '../../utils/Validators/bookValidator'
 import { BookService, ICreateBook } from '../../services/BookService'
 import { handlerValidationError } from '../../utils/Validators/handlerValidation'
 import { logger } from '../../utils/Logger'
+import {
+  handlerErrorsBuilder,
+  ResponseBuilder
+} from '../../utils/ResponseBuilder'
 
 export class CreateBookController {
   constructor(private service: BookService) {}
@@ -23,28 +27,22 @@ export class CreateBookController {
         code: 'success',
         message: 'Livro criado com sucesso',
         data: newBook
-      })
+      } as ResponseBuilder)
     } catch (error: Error | any) {
-      logger.error('create book controller | error:', { error })
-
       const validationError = handlerValidationError(error)
 
       if (validationError) {
         return res.status(400).json(validationError)
       }
 
-      if (error.status) {
-        return res.status(error.status).json({
-          code: error.code,
-          message: error.message,
-          data: error.data
-        })
-      }
+      const errorBuilder = handlerErrorsBuilder(error)
 
-      return res.status(500).json({
-        code: 'error.internal',
-        message: error.message
+      logger.error('create book controller | error:', {
+        error: errorBuilder,
+        originalError: error
       })
+
+      return res.status(errorBuilder.status).json(errorBuilder)
     }
   }
 }

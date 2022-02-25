@@ -1,6 +1,6 @@
 import { Author } from '.prisma/client'
 import { prismaClient } from '../../prisma'
-import { handlerErrorsPrisma } from '../../utils/HandlerErrorsPrisma'
+import { handlerErrorsBuilder } from '../../utils/ResponseBuilder'
 import { logger } from '../../utils/Logger'
 
 export interface ICreateAuthor {
@@ -18,7 +18,7 @@ export const createAuthorService = async (
     return author
   } catch (error: any) {
     const defaultError = 'Erro para criar novo autor'
-    const errorBuilder = handlerErrorsPrisma(error, defaultError)
+    const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
     logger.error('create author service | error:', {
       error: errorBuilder,
@@ -36,7 +36,7 @@ export const getAllAuthorsService = async (): Promise<Author[]> => {
     return authors
   } catch (error: any) {
     const defaultError = 'Erro para buscar lista de autores no banco'
-    const errorBuilder = handlerErrorsPrisma(error, defaultError)
+    const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
     logger.error('get all authors service | error:', {
       error: errorBuilder,
@@ -60,7 +60,7 @@ export const getAuthorByIdService = async (
     return author
   } catch (error) {
     const defaultError = 'Erro para buscar ID do autor no banco'
-    const errorBuilder = handlerErrorsPrisma(error, defaultError)
+    const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
     logger.error('get author by id service | error:', {
       error: errorBuilder,
@@ -86,7 +86,7 @@ export const putAuthorService = async (
     return authorUpdated
   } catch (error) {
     const defaultError = 'Erro para atualizar autor no banco'
-    const errorBuilder = handlerErrorsPrisma(error, defaultError)
+    const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
     logger.error('put author service | error:', {
       error: errorBuilder,
@@ -116,7 +116,7 @@ export const deleteAuthorService = async (id: number): Promise<Author> => {
     return authorDeleted
   } catch (error) {
     const defaultError = 'Erro para deletar autor no banco'
-    const errorBuilder = handlerErrorsPrisma(error, defaultError)
+    const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
     logger.error('delete author service | error:', {
       error: errorBuilder,

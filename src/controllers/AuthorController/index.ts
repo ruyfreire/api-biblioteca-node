@@ -7,6 +7,10 @@ import {
   ICreateAuthor,
   putAuthorService
 } from '../../services/AuthorService'
+import {
+  ResponseBuilder,
+  handlerErrorsBuilder
+} from '../../utils/ResponseBuilder'
 import { logger } from '../../utils/Logger'
 import { schemaCreateAuthor } from '../../utils/Validators/authorValidator'
 import { handlerValidationError } from '../../utils/Validators/handlerValidation'
@@ -27,28 +31,22 @@ export const createAuthorController = async (req: Request, res: Response) => {
       code: 'success',
       message: 'Autor criado com sucesso',
       data: newAuthor
-    })
+    } as ResponseBuilder)
   } catch (error: Error | any) {
-    logger.error('create author controller | error:', { error })
-
     const validationError = handlerValidationError(error)
 
     if (validationError) {
       return res.status(400).json(validationError)
     }
 
-    if (error.status) {
-      return res.status(error.status).json({
-        code: error.code,
-        message: error.message,
-        data: error.data
-      })
-    }
+    const errorBuilder = handlerErrorsBuilder(error)
 
-    return res.status(500).json({
-      code: 'error.internal',
-      message: error.message
+    logger.error('create author controller | error:', {
+      error: errorBuilder,
+      originalError: error
     })
+
+    return res.status(errorBuilder.status).json(errorBuilder)
   }
 }
 
@@ -62,22 +60,16 @@ export const getAllAuthorsController = async (req: Request, res: Response) => {
       code: 'success',
       message: 'Listagem com todos os autores',
       data: authors
-    })
+    } as ResponseBuilder)
   } catch (error: Error | any) {
-    logger.error('get all authors controller | error:', { error })
+    const errorBuilder = handlerErrorsBuilder(error)
 
-    if (error.status) {
-      return res.status(error.status).json({
-        code: error.code,
-        message: error.message,
-        data: error.data
-      })
-    }
-
-    return res.status(500).json({
-      code: 'error.internal',
-      message: error.message
+    logger.error('get all authors controller | error:', {
+      error: errorBuilder,
+      originalError: error
     })
+
+    return res.status(errorBuilder.status).json(errorBuilder)
   }
 }
 
@@ -86,14 +78,15 @@ export const getAuthorByIdController = async (req: Request, res: Response) => {
     const { id } = req.params
 
     if (!Number(id)) {
-      const error = {
+      const error = new ResponseBuilder({
+        status: 400,
         code: 'error.validation',
         message: 'ID inválido'
-      }
+      })
 
       logger.error('get author by id | error:', { error })
 
-      return res.status(400).json(error)
+      return res.status(error.status).json(error)
     }
 
     const author = await getAuthorByIdService(Number(id))
@@ -104,7 +97,7 @@ export const getAuthorByIdController = async (req: Request, res: Response) => {
       return res.status(404).json({
         code: 'error.notFound',
         message: 'Autor não encontrado'
-      })
+      } as ResponseBuilder)
     }
 
     logger.info(`get author by id | Autor retornado com sucesso | ID: ${id}`)
@@ -113,22 +106,16 @@ export const getAuthorByIdController = async (req: Request, res: Response) => {
       code: 'success',
       message: 'Autor encontrado',
       data: author
-    })
+    } as ResponseBuilder)
   } catch (error: Error | any) {
-    logger.error('get author by id | error:', { error })
+    const errorBuilder = handlerErrorsBuilder(error)
 
-    if (error.status) {
-      return res.status(error.status).json({
-        code: error.code,
-        message: error.message,
-        data: error.data
-      })
-    }
-
-    return res.status(500).json({
-      code: 'error.internal',
-      message: error.message
+    logger.error('get author by id | error:', {
+      error: errorBuilder,
+      originalError: error
     })
+
+    return res.status(errorBuilder.status).json(errorBuilder)
   }
 }
 
@@ -138,14 +125,15 @@ export const putAuthorController = async (req: Request, res: Response) => {
     const author = req.body as ICreateAuthor
 
     if (!Number(id)) {
-      const error = {
+      const error = new ResponseBuilder({
+        status: 400,
         code: 'error.validation',
         message: 'ID inválido'
-      }
+      })
 
       logger.error('update author controller | error:', { error })
 
-      return res.status(400).json(error)
+      return res.status(error.status).json(error)
     }
 
     await schemaCreateAuthor.validate(author)
@@ -160,28 +148,22 @@ export const putAuthorController = async (req: Request, res: Response) => {
       code: 'success',
       message: 'Autor atualizado com sucesso',
       data: authorUpdated
-    })
+    } as ResponseBuilder)
   } catch (error: Error | any) {
-    logger.error('update author controller | error:', { error })
-
     const validationError = handlerValidationError(error)
 
     if (validationError) {
       return res.status(400).json(validationError)
     }
 
-    if (error.status) {
-      return res.status(error.status).json({
-        code: error.code,
-        message: error.message,
-        data: error.data
-      })
-    }
+    const errorBuilder = handlerErrorsBuilder(error)
 
-    return res.status(500).json({
-      code: 'error.internal',
-      message: error.message
+    logger.error('update author controller | error:', {
+      error: errorBuilder,
+      originalError: error
     })
+
+    return res.status(errorBuilder.status).json(errorBuilder)
   }
 }
 
@@ -190,14 +172,15 @@ export const deleteAuthorController = async (req: Request, res: Response) => {
     const { id } = req.params
 
     if (!Number(id)) {
-      const error = {
+      const error = new ResponseBuilder({
+        status: 400,
         code: 'error.validation',
         message: 'ID inválido'
-      }
+      })
 
       logger.error('delete author controller | error:', { error })
 
-      return res.status(400).json(error)
+      return res.status(error.status).json(error)
     }
 
     await deleteAuthorService(Number(id))
@@ -209,21 +192,15 @@ export const deleteAuthorController = async (req: Request, res: Response) => {
     return res.status(200).json({
       code: 'success',
       message: 'Autor deletado com sucesso'
-    })
+    } as ResponseBuilder)
   } catch (error: Error | any) {
-    logger.error('delete author controller | error:', { error })
+    const errorBuilder = handlerErrorsBuilder(error)
 
-    if (error.status) {
-      return res.status(error.status).json({
-        code: error.code,
-        message: error.message,
-        data: error.data
-      })
-    }
-
-    return res.status(500).json({
-      code: 'error.internal',
-      message: error.message
+    logger.error('delete author controller | error:', {
+      error: errorBuilder,
+      originalError: error
     })
+
+    return res.status(errorBuilder.status).json(errorBuilder)
   }
 }

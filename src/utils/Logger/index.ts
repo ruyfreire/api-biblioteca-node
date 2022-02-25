@@ -18,7 +18,13 @@ const logger = winston.createLogger({
           const data = JSON.stringify(meta)
           const errorMessage = meta?.error?.message || ''
           const restMessage = data.length > 2 ? errorMessage : ''
-          return `${timestamp} [${level}]: ${message} ${restMessage}`.trim()
+
+          let idError = ''
+          if (level === 'error' && meta?.error?.id_error) {
+            idError = `| id_error: ${meta.error.id_error}`
+          }
+
+          return `${timestamp} [${level}]: ${message} ${restMessage} ${idError}`.trim()
         }),
         winston.format.colorize({
           all: true

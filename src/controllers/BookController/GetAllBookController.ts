@@ -1,6 +1,10 @@
 import { Request, Response } from 'express'
 import { BookService } from '../../services/BookService'
 import { logger } from '../../utils/Logger'
+import {
+  handlerErrorsBuilder,
+  ResponseBuilder
+} from '../../utils/ResponseBuilder'
 
 export class GetAllBookController {
   constructor(private service: BookService) {}
@@ -15,22 +19,16 @@ export class GetAllBookController {
         code: 'success',
         message: 'Listagem com todos os livros',
         data: books
-      })
+      } as ResponseBuilder)
     } catch (error: Error | any) {
-      logger.error('get all books controller | error:', { error })
+      const errorBuilder = handlerErrorsBuilder(error)
 
-      if (error.status) {
-        return res.status(error.status).json({
-          code: error.code,
-          message: error.message,
-          data: error.data
-        })
-      }
-
-      return res.status(500).json({
-        code: 'error.internal',
-        message: error.message
+      logger.error('get all books controller | error:', {
+        error: errorBuilder,
+        originalError: error
       })
+
+      return res.status(errorBuilder.status).json(errorBuilder)
     }
   }
 }

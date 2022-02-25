@@ -1,6 +1,7 @@
 import { Book, Author } from '.prisma/client'
 import { prismaClient } from '../../prisma'
-import { handlerErrorsPrisma } from '../../utils/HandlerErrorsPrisma'
+import { ResponseBuilder } from '../../utils/ResponseBuilder'
+import { handlerErrorsBuilder } from '../../utils/ResponseBuilder'
 import { logger } from '../../utils/Logger'
 
 export interface ICreateBook {
@@ -26,12 +27,12 @@ export class BookService {
       const authorList = book?.authors || []
 
       if (authorList.length === 0) {
-        throw {
+        throw new ResponseBuilder({
           code: 'error.validation',
           status: 400,
           message: 'É necessário informar pelo menos um autor',
           data: null
-        }
+        })
       }
 
       const authorsFound = await prismaClient.author.findMany({
@@ -43,14 +44,14 @@ export class BookService {
       })
 
       if (authorsFound.length !== authorList.length) {
-        throw {
+        throw new ResponseBuilder({
           code: 'error.notFound',
           status: 400,
           message: 'Um ou mais autores não foram encontrados',
           data: authorList.filter(
             (authorId) => !authorsFound.some((author) => author.id === authorId)
           )
-        }
+        })
       }
 
       const newBook = await prismaClient.book.create({
@@ -81,7 +82,7 @@ export class BookService {
       return bookResponse
     } catch (error: any) {
       const defaultError = 'Erro para criar novo livro'
-      const errorBuilder = handlerErrorsPrisma(error, defaultError)
+      const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
       logger.error('create book service | error:', {
         error: errorBuilder,
@@ -109,7 +110,7 @@ export class BookService {
       return booksResponse
     } catch (error) {
       const defaultError = 'Erro para buscar lista de livros no banco'
-      const errorBuilder = handlerErrorsPrisma(error, defaultError)
+      const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
       logger.error('get all books service | error:', {
         error: errorBuilder,
@@ -144,7 +145,7 @@ export class BookService {
       return book
     } catch (error) {
       const defaultError = 'Erro para buscar livro no banco'
-      const errorBuilder = handlerErrorsPrisma(error, defaultError)
+      const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
       logger.error('get book by id service | error:', {
         error: errorBuilder,
@@ -160,12 +161,12 @@ export class BookService {
       const authorList = book?.authors || []
 
       if (authorList.length === 0) {
-        throw {
+        throw new ResponseBuilder({
           code: 'error.validation',
           status: 400,
           message: 'É necessário informar pelo menos um autor',
           data: null
-        }
+        })
       }
 
       const authorsFound = await prismaClient.author.findMany({
@@ -177,14 +178,14 @@ export class BookService {
       })
 
       if (authorsFound.length !== authorList.length) {
-        throw {
+        throw new ResponseBuilder({
           code: 'error.notFound',
           status: 400,
           message: 'Um ou mais autores não foram encontrados',
           data: authorList.filter(
             (authorId) => !authorsFound.some((author) => author.id === authorId)
           )
-        }
+        })
       }
 
       const updatedBook = await prismaClient.book.update({
@@ -234,7 +235,7 @@ export class BookService {
       return bookResponse
     } catch (error) {
       const defaultError = 'Erro para atualizar livro no banco'
-      const errorBuilder = handlerErrorsPrisma(error, defaultError)
+      const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
       logger.error('update book service | error:', {
         error: errorBuilder,
@@ -256,7 +257,7 @@ export class BookService {
       return deletedBook
     } catch (error) {
       const defaultError = 'Erro para deletar livro no banco'
-      const errorBuilder = handlerErrorsPrisma(error, defaultError)
+      const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
       logger.error('delete book service | error:', {
         error: errorBuilder,
