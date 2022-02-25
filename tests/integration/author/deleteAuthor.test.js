@@ -39,6 +39,7 @@ describe('Test integration: Delete author', () => {
     it('400, Should return validation error', async () => {
       const response = await agent.delete('/author/id').expect(400)
 
+      expect(response.body.code).toBe('error.validation')
       expect(response.body.message).toBe('ID inválido')
     })
 
@@ -54,11 +55,12 @@ describe('Test integration: Delete author', () => {
     it('500, Should return internal error', async () => {
       jest
         .spyOn(prismaClient.author, 'delete')
-        .mockImplementation(() => Promise.reject(new Error('Internal error')))
+        .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.delete('/author/99').expect(500)
 
-      expect(response.body.code).toBe('error.internal')
+      expect(response.body.code).toBe('error.database.internal')
+      expect(response.body.message).toBe('Erro para deletar autor no banco')
     })
   })
 })

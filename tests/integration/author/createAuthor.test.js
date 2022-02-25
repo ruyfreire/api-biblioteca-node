@@ -61,11 +61,12 @@ describe('Test integration: Create Author', () => {
 
       jest
         .spyOn(prismaClient.author, 'create')
-        .mockImplementation(() => Promise.reject(new Error('Internal error')))
+        .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.post('/author').send(author).expect(500)
 
-      expect(response.body.code).toBe('error.internal')
+      expect(response.body.code).toBe('error.database.internal')
+      expect(response.body.message).toBe('Erro para criar novo autor')
     })
   })
 })

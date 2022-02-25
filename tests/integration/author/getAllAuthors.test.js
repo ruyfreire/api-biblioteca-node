@@ -35,28 +35,17 @@ describe('Test integration: Get all Authors', () => {
   })
 
   describe('Error cases', () => {
-    it('500, Should return internal error database', async () => {
-      const errorPrisma = new Prisma.PrismaClientValidationError()
-      jest
-        .spyOn(prismaClient.author, 'findMany')
-        .mockImplementation(() => Promise.reject(errorPrisma))
-
-      const response = await agent.get('/author').expect(500)
-
-      expect(response.body.code).toBe('error.database.validation')
-      expect(response.body.message).toBe(
-        'Erro de validação dos campos ao comunicar com banco'
-      )
-    })
-
     it('500, Should return internal error', async () => {
       jest
         .spyOn(prismaClient.author, 'findMany')
-        .mockImplementation(() => Promise.reject(new Error('Internal error')))
+        .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.get('/author').expect(500)
 
-      expect(response.body.code).toBe('error.internal')
+      expect(response.body.code).toBe('error.database.internal')
+      expect(response.body.message).toBe(
+        'Erro para buscar lista de autores no banco'
+      )
     })
   })
 })

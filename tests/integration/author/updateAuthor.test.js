@@ -43,6 +43,7 @@ describe('Test integration: Update Author', () => {
     it('400, Should return validation error path param', async () => {
       const response = await agent.put('/author/id').expect(400)
 
+      expect(response.body.code).toBe('error.validation')
       expect(response.body.message).toBe('ID inválido')
     })
 
@@ -75,11 +76,12 @@ describe('Test integration: Update Author', () => {
 
       jest
         .spyOn(prismaClient.author, 'update')
-        .mockImplementation(() => Promise.reject(new Error('Internal error')))
+        .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.put('/author/99').send(author).expect(500)
 
-      expect(response.body.code).toBe('error.internal')
+      expect(response.body.code).toBe('error.database.internal')
+      expect(response.body.message).toBe('Erro para atualizar autor no banco')
     })
   })
 })
