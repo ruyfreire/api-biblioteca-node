@@ -1,4 +1,6 @@
 import { Request, Response } from 'express'
+import { validate as validateUuidv4 } from 'uuid'
+
 import { BookService } from '../../services/BookService'
 import { logger } from '../../utils/Logger'
 import {
@@ -13,7 +15,7 @@ export class DeleteBookController {
     try {
       const { id } = req.params
 
-      if (!Number(id)) {
+      if (!validateUuidv4(id)) {
         const error = new ResponseBuilder({
           status: 400,
           code: 'error.validation',
@@ -25,7 +27,7 @@ export class DeleteBookController {
         return res.status(error.status).json(error)
       }
 
-      await this.service.delete(Number(id))
+      await this.service.delete(id)
 
       logger.info(
         `delete book controller | Livro deletado com sucesso | ID: ${id}`
@@ -38,7 +40,7 @@ export class DeleteBookController {
     } catch (error: Error | any) {
       const errorBuilder = handlerErrorsBuilder(error)
 
-      logger.error('delete book controller | error:', {
+      logger.error(`delete book controller | ID: ${req.params.id} | error:`, {
         error: errorBuilder,
         originalError: error
       })

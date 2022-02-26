@@ -1,4 +1,6 @@
 import { Request, Response } from 'express'
+import { validate as validateUuidv4 } from 'uuid'
+
 import { validatorCreateBook } from '../../utils/Validators/bookValidator'
 import { BookService, ICreateBook } from '../../services/BookService'
 import { handlerValidationError } from '../../utils/Validators/handlerValidation'
@@ -16,7 +18,7 @@ export class UpdateBookController {
       const { id } = req.params
       const book = req.body as ICreateBook
 
-      if (!Number(id)) {
+      if (!validateUuidv4(id)) {
         const error = new ResponseBuilder({
           status: 400,
           code: 'error.validation',
@@ -30,7 +32,7 @@ export class UpdateBookController {
 
       await validatorCreateBook(book)
 
-      const updatedBook = await this.service.update(Number(id), book)
+      const updatedBook = await this.service.update(id, book)
 
       logger.info(
         `update book controller | Livro atualizado com sucesso | ID: ${id}`
@@ -50,7 +52,7 @@ export class UpdateBookController {
 
       const errorBuilder = handlerErrorsBuilder(error)
 
-      logger.error('update book controller | error:', {
+      logger.error(`update book controller | ID: ${req.params.id} | error:`, {
         error: errorBuilder,
         originalError: error
       })

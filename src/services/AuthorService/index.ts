@@ -48,7 +48,7 @@ export const getAllAuthorsService = async (): Promise<Author[]> => {
 }
 
 export const getAuthorByIdService = async (
-  id: number
+  id: string
 ): Promise<Author | null> => {
   try {
     const author = await prismaClient.author.findFirst({
@@ -62,7 +62,7 @@ export const getAuthorByIdService = async (
     const defaultError = 'Erro para buscar ID do autor no banco'
     const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
-    logger.error('get author by id service | error:', {
+    logger.error(`get author by id service | ID: ${id} | error:`, {
       error: errorBuilder,
       originalError: error
     })
@@ -73,7 +73,7 @@ export const getAuthorByIdService = async (
 
 export const putAuthorService = async (
   author: ICreateAuthor,
-  id: number
+  id: string
 ): Promise<Author> => {
   try {
     const authorUpdated = await prismaClient.author.update({
@@ -88,7 +88,7 @@ export const putAuthorService = async (
     const defaultError = 'Erro para atualizar autor no banco'
     const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
-    logger.error('put author service | error:', {
+    logger.error(`put author service | ID: ${id} | error:`, {
       error: errorBuilder,
       originalError: error
     })
@@ -97,7 +97,7 @@ export const putAuthorService = async (
   }
 }
 
-export const deleteAuthorService = async (id: number): Promise<Author> => {
+export const deleteAuthorService = async (id: string): Promise<Author> => {
   try {
     const authorDeleted = await prismaClient.author.delete({
       where: {
@@ -118,7 +118,7 @@ export const deleteAuthorService = async (id: number): Promise<Author> => {
     const defaultError = 'Erro para deletar autor no banco'
     const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
-    logger.error('delete author service | error:', {
+    logger.error(`delete author service | ID: ${id} | error:`, {
       error: errorBuilder,
       originalError: error
     })

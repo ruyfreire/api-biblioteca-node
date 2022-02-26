@@ -1,4 +1,6 @@
 import request from 'supertest'
+import { v4 as uuidv4 } from 'uuid'
+
 import { Server } from '../../../src/server'
 import { prismaClient } from '../../../src/prisma'
 
@@ -112,7 +114,7 @@ describe('Test integration: Create Book', () => {
       const book = {
         name: 'Book name',
         summary: 'Summary book',
-        authors: [99]
+        authors: [uuidv4()]
       }
 
       const response = await agent.post('/book').send(book).expect(400)

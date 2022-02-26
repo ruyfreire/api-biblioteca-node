@@ -5,7 +5,7 @@ import { GlobalSchema } from './globalSchema'
 const schemaCreateBook: SchemaOf<ICreateBook> = GlobalSchema.shape({
   name: string().min(3).max(100).required(),
   summary: string().min(6).max(500).required(),
-  authors: array().of(number().integer().required()).required()
+  authors: array().of(string().uuid().required()).required()
 })
 
 export const validatorCreateBook = (body: any) => {

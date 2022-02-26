@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Author {
-  id   Int    @id @default(autoincrement())
+  id   String @id @default(uuid())
   name String @unique
 
   books AuthorAndBook[]
@@ -20,7 +20,7 @@ model Author {
 }
 
 model Book {
-  id      Int    @id @default(autoincrement())
+  id      String @id @default(uuid())
   name    String @unique
   summary String
 
@@ -31,9 +31,9 @@ model Book {
 
 model AuthorAndBook {
   author   Author @relation(fields: [authorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  authorId Int
+  authorId String
   book     Book   @relation(fields: [bookId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  bookId   Int
+  bookId   String
 
   @@id([authorId, bookId])
   @@map("author_book")

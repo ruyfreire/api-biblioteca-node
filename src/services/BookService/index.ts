@@ -7,7 +7,7 @@ import { logger } from '../../utils/Logger'
 export interface ICreateBook {
   name: string
   summary: string
-  authors: number[]
+  authors: string[]
 }
 
 const formatResponseBook = (
@@ -121,7 +121,7 @@ export class BookService {
     }
   }
 
-  async getById(id: number): Promise<Book | null> {
+  async getById(id: string): Promise<Book | null> {
     try {
       const book = await prismaClient.book.findFirst({
         where: {
@@ -147,7 +147,7 @@ export class BookService {
       const defaultError = 'Erro para buscar livro no banco'
       const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
-      logger.error('get book by id service | error:', {
+      logger.error(`get book by id service | ID: ${id} | error:`, {
         error: errorBuilder,
         originalError: error
       })
@@ -156,7 +156,7 @@ export class BookService {
     }
   }
 
-  async update(id: number, book: ICreateBook): Promise<Book> {
+  async update(id: string, book: ICreateBook): Promise<Book> {
     try {
       const authorList = book?.authors || []
 
@@ -237,7 +237,7 @@ export class BookService {
       const defaultError = 'Erro para atualizar livro no banco'
       const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
-      logger.error('update book service | error:', {
+      logger.error(`update book service | ID: ${id} | error:`, {
         error: errorBuilder,
         originalError: error
       })
@@ -246,7 +246,7 @@ export class BookService {
     }
   }
 
-  async delete(id: number): Promise<Book> {
+  async delete(id: string): Promise<Book> {
     try {
       const deletedBook = await prismaClient.book.delete({
         where: {
@@ -259,7 +259,7 @@ export class BookService {
       const defaultError = 'Erro para deletar livro no banco'
       const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
-      logger.error('delete book service | error:', {
+      logger.error(`delete book service | ID: ${id} | error:`, {
         error: errorBuilder,
         originalError: error
       })

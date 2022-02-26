@@ -1,4 +1,6 @@
 import request from 'supertest'
+import { v4 as uuidv4 } from 'uuid'
+
 import { Server } from '../../../src/server'
 import { prismaClient } from '../../../src/prisma'
 
@@ -71,17 +73,19 @@ describe('Test integration: Update Book', () => {
     })
 
     it('400, Should return validation error property', async () => {
+      const uuid = uuidv4()
       const book = {
         name: 'Book name'
       }
 
-      const response = await agent.put('/book/1').send(book).expect(400)
+      const response = await agent.put(`/book/${uuid}`).send(book).expect(400)
 
       expect(response.body.message).toBe('Erro de validação dos campos')
       expect(response.body.data).toContain('Campo obrigatório: summary')
     })
 
     it('400, Should return book not found', async () => {
+      const uuid = uuidv4()
       const authorCreated = await prismaClient.author.create({
         data: { name: 'Author name' }
       })
@@ -92,7 +96,7 @@ describe('Test integration: Update Book', () => {
         authors: [authorCreated.id]
       }
 
-      const response = await agent.put('/book/99').send(book).expect(404)
+      const response = await agent.put(`/book/${uuid}`).send(book).expect(404)
 
       expect(response.body.code).toBe('error.database.notFound')
       expect(response.body.message).toBe(
@@ -101,13 +105,14 @@ describe('Test integration: Update Book', () => {
     })
 
     it('400, Should require authors list', async () => {
+      const uuid = uuidv4()
       const book = {
         name: 'Book name',
         summary: 'Summary book',
         authors: []
       }
 
-      const response = await agent.put('/book/99').send(book).expect(400)
+      const response = await agent.put(`/book/${uuid}`).send(book).expect(400)
 
       expect(response.body.code).toBe('error.validation')
       expect(response.body.message).toBe(
@@ -116,13 +121,14 @@ describe('Test integration: Update Book', () => {
     })
 
     it('400, Should return author not found', async () => {
+      const uuid = uuidv4()
       const book = {
         name: 'Book name',
         summary: 'Summary book',
-        authors: [99]
+        authors: [uuid]
       }
 
-      const response = await agent.put('/book/99').send(book).expect(400)
+      const response = await agent.put(`/book/${uuid}`).send(book).expect(400)
 
       expect(response.body.code).toBe('error.notFound')
       expect(response.body.message).toBe(
@@ -131,6 +137,7 @@ describe('Test integration: Update Book', () => {
     })
 
     it('500, Should return internal error', async () => {
+      const uuid = uuidv4()
       const authorCreated = await prismaClient.author.create({
         data: { name: 'Author name' }
       })
@@ -145,7 +152,7 @@ describe('Test integration: Update Book', () => {
         .spyOn(prismaClient.book, 'update')
         .mockImplementation(() => Promise.reject(new Error()))
 
-      const response = await agent.put('/book/99').send(book).expect(500)
+      const response = await agent.put(`/book/${uuid}`).send(book).expect(500)
 
       expect(response.body.code).toBe('error.database.internal')
       expect(response.body.message).toBe('Erro para atualizar livro no banco')

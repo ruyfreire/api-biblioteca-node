@@ -1,4 +1,6 @@
 import { Request, Response } from 'express'
+import { validate as validateUuidv4 } from 'uuid'
+
 import {
   createAuthorService,
   deleteAuthorService,
@@ -77,7 +79,7 @@ export const getAuthorByIdController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
 
-    if (!Number(id)) {
+    if (!validateUuidv4(id)) {
       const error = new ResponseBuilder({
         status: 400,
         code: 'error.validation',
@@ -89,7 +91,7 @@ export const getAuthorByIdController = async (req: Request, res: Response) => {
       return res.status(error.status).json(error)
     }
 
-    const author = await getAuthorByIdService(Number(id))
+    const author = await getAuthorByIdService(id)
 
     if (!author) {
       logger.warn(`get author by id | Autor não encontrado | ID: ${id}`)
@@ -110,7 +112,7 @@ export const getAuthorByIdController = async (req: Request, res: Response) => {
   } catch (error: Error | any) {
     const errorBuilder = handlerErrorsBuilder(error)
 
-    logger.error('get author by id | error:', {
+    logger.error(`get author by id | ID: ${req.params.id} | error:`, {
       error: errorBuilder,
       originalError: error
     })
@@ -124,7 +126,7 @@ export const putAuthorController = async (req: Request, res: Response) => {
     const { id } = req.params
     const author = req.body as ICreateAuthor
 
-    if (!Number(id)) {
+    if (!validateUuidv4(id)) {
       const error = new ResponseBuilder({
         status: 400,
         code: 'error.validation',
@@ -138,7 +140,7 @@ export const putAuthorController = async (req: Request, res: Response) => {
 
     await schemaCreateAuthor.validate(author)
 
-    const authorUpdated = await putAuthorService(author, Number(id))
+    const authorUpdated = await putAuthorService(author, id)
 
     logger.info(
       `update author controller | Autor atualizado com sucesso | ID: ${id}`
@@ -158,7 +160,7 @@ export const putAuthorController = async (req: Request, res: Response) => {
 
     const errorBuilder = handlerErrorsBuilder(error)
 
-    logger.error('update author controller | error:', {
+    logger.error(`update author controller | ID: ${req.params.id} | error:`, {
       error: errorBuilder,
       originalError: error
     })
@@ -171,7 +173,7 @@ export const deleteAuthorController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
 
-    if (!Number(id)) {
+    if (!validateUuidv4(id)) {
       const error = new ResponseBuilder({
         status: 400,
         code: 'error.validation',
@@ -183,7 +185,7 @@ export const deleteAuthorController = async (req: Request, res: Response) => {
       return res.status(error.status).json(error)
     }
 
-    await deleteAuthorService(Number(id))
+    await deleteAuthorService(id)
 
     logger.info(
       `delete author controller | Autor deletado com sucesso | ID: ${id}`
@@ -196,7 +198,7 @@ export const deleteAuthorController = async (req: Request, res: Response) => {
   } catch (error: Error | any) {
     const errorBuilder = handlerErrorsBuilder(error)
 
-    logger.error('delete author controller | error:', {
+    logger.error(`delete author controller | ID: ${req.params.id} | error:`, {
       error: errorBuilder,
       originalError: error
     })

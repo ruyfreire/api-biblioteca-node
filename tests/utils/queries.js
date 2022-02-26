@@ -2,17 +2,17 @@ import { Prisma } from '@prisma/client'
 
 export const createTableQueries = [
   Prisma.sql`CREATE TABLE IF NOT EXISTS main.books (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id TEXT NOT NULL PRIMARY KEY,
         name TEXT UNIQUE,
         summary TEXT
     )`,
   Prisma.sql`CREATE TABLE IF NOT EXISTS main.authors (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id TEXT NOT NULL PRIMARY KEY,
         name TEXT UNIQUE
     )`,
   Prisma.sql`CREATE TABLE IF NOT EXISTS main.author_book (
-        authorId INTEGER NOT NULL,
-        bookId INTEGER NOT NULL,
+        authorId TEXT NOT NULL,
+        bookId TEXT NOT NULL,
     
         PRIMARY KEY ("authorId", "bookId"),
         CONSTRAINT "author_book_authorId_fkey" FOREIGN KEY ("authorId") REFERENCES "authors" ("id") ON DELETE CASCADE ON UPDATE CASCADE,

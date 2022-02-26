@@ -1,4 +1,6 @@
 import { Request, Response } from 'express'
+import { validate as validateUuidv4 } from 'uuid'
+
 import { BookService } from '../../services/BookService'
 import { logger } from '../../utils/Logger'
 import {
@@ -13,7 +15,7 @@ export class GetByIdBookController {
     try {
       const { id } = req.params
 
-      if (!Number(id)) {
+      if (!validateUuidv4(id)) {
         const error = new ResponseBuilder({
           status: 400,
           code: 'error.validation',
@@ -25,7 +27,7 @@ export class GetByIdBookController {
         return res.status(error.status).json(error)
       }
 
-      const book = await this.service.getById(Number(id))
+      const book = await this.service.getById(id)
 
       if (!book) {
         logger.warn(
@@ -50,10 +52,13 @@ export class GetByIdBookController {
     } catch (error: Error | any) {
       const errorBuilder = handlerErrorsBuilder(error)
 
-      logger.error('get book by id controller | error:', {
-        error: errorBuilder,
-        originalError: error
-      })
+      logger.error(
+        `get book by id controller | ID: ${req.params.id} | error:`,
+        {
+          error: errorBuilder,
+          originalError: error
+        }
+      )
 
       return res.status(errorBuilder.status).json(errorBuilder)
     }
