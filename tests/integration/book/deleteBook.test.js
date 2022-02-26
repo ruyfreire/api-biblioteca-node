@@ -40,7 +40,7 @@ describe('Test integration: Delete book', () => {
     it('400, Should return validation error', async () => {
       const response = await agent.delete('/book/id').expect(400)
 
-      expect(response.body.message).toBe('ID inválido')
+      expect(response.body.message).toBe('ID precisa ser um uuid válido')
     })
 
     it('400, Should return book not found', async () => {

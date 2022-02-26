@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { validate as validateUuidv4 } from 'uuid'
 
 import { BookService } from '../../services/BookService'
 import { logger } from '../../utils/Logger'
@@ -14,18 +13,6 @@ export class GetByIdBookController {
   async execute(req: Request, res: Response) {
     try {
       const { id } = req.params
-
-      if (!validateUuidv4(id)) {
-        const error = new ResponseBuilder({
-          status: 400,
-          code: 'error.validation',
-          message: 'ID inválido'
-        })
-
-        logger.error('get book by id controller | error:', { error })
-
-        return res.status(error.status).json(error)
-      }
 
       const book = await this.service.getById(id)
 

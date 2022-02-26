@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
-import { validatorCreateBook } from '../../utils/Validators/bookValidator'
+
 import { BookService, ICreateBook } from '../../services/BookService'
-import { handlerValidationError } from '../../utils/Validators/handlerValidation'
 import { logger } from '../../utils/Logger'
 import {
   handlerErrorsBuilder,
@@ -15,8 +14,6 @@ export class CreateBookController {
     try {
       const book = req.body as ICreateBook
 
-      await validatorCreateBook(book)
-
       const newBook = await this.service.create(book)
 
       logger.info(
@@ -29,12 +26,6 @@ export class CreateBookController {
         data: newBook
       } as ResponseBuilder)
     } catch (error: Error | any) {
-      const validationError = handlerValidationError(error)
-
-      if (validationError) {
-        return res.status(400).json(validationError)
-      }
-
       const errorBuilder = handlerErrorsBuilder(error)
 
       logger.error('create book controller | error:', {

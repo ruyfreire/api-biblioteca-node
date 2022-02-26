@@ -105,8 +105,9 @@ describe('Test integration: Create Book', () => {
       const response = await agent.post('/book').send(book).expect(400)
 
       expect(response.body.code).toBe('error.validation')
-      expect(response.body.message).toBe(
-        'É necessário informar pelo menos um autor'
+      expect(response.body.message).toBe('Erro de validação dos campos')
+      expect(response.body.data).toContain(
+        'O array de autores precisa ter pelo menos um autor'
       )
     })
 

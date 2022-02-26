@@ -40,6 +40,7 @@ const logger = winston.createLogger({
           let errorMessage = meta?.error || ''
 
           if (originalMessage instanceof Error) {
+            console.log('originalMessage logger')
             originalMessage = originalMessage.message
           }
 

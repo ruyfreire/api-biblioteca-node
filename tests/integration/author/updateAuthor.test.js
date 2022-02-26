@@ -46,7 +46,7 @@ describe('Test integration: Update Author', () => {
       const response = await agent.put('/author/id').expect(400)
 
       expect(response.body.code).toBe('error.validation')
-      expect(response.body.message).toBe('ID inválido')
+      expect(response.body.message).toBe('ID precisa ser um uuid válido')
     })
 
     it('400, Should return validation error property', async () => {

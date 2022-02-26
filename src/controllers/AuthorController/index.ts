@@ -1,5 +1,4 @@
 import { Request, Response } from 'express'
-import { validate as validateUuidv4 } from 'uuid'
 
 import {
   createAuthorService,
@@ -14,14 +13,10 @@ import {
   handlerErrorsBuilder
 } from '../../utils/ResponseBuilder'
 import { logger } from '../../utils/Logger'
-import { schemaCreateAuthor } from '../../utils/Validators/authorValidator'
-import { handlerValidationError } from '../../utils/Validators/handlerValidation'
 
 export const createAuthorController = async (req: Request, res: Response) => {
   try {
     const author = req.body as ICreateAuthor
-
-    await schemaCreateAuthor.validate(author)
 
     const newAuthor = await createAuthorService(author)
 
@@ -35,12 +30,6 @@ export const createAuthorController = async (req: Request, res: Response) => {
       data: newAuthor
     } as ResponseBuilder)
   } catch (error: Error | any) {
-    const validationError = handlerValidationError(error)
-
-    if (validationError) {
-      return res.status(400).json(validationError)
-    }
-
     const errorBuilder = handlerErrorsBuilder(error)
 
     logger.error('create author controller | error:', {
@@ -79,18 +68,6 @@ export const getAuthorByIdController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
 
-    if (!validateUuidv4(id)) {
-      const error = new ResponseBuilder({
-        status: 400,
-        code: 'error.validation',
-        message: 'ID inválido'
-      })
-
-      logger.error('get author by id | error:', { error })
-
-      return res.status(error.status).json(error)
-    }
-
     const author = await getAuthorByIdService(id)
 
     if (!author) {
@@ -126,20 +103,6 @@ export const putAuthorController = async (req: Request, res: Response) => {
     const { id } = req.params
     const author = req.body as ICreateAuthor
 
-    if (!validateUuidv4(id)) {
-      const error = new ResponseBuilder({
-        status: 400,
-        code: 'error.validation',
-        message: 'ID inválido'
-      })
-
-      logger.error('update author controller | error:', { error })
-
-      return res.status(error.status).json(error)
-    }
-
-    await schemaCreateAuthor.validate(author)
-
     const authorUpdated = await putAuthorService(author, id)
 
     logger.info(
@@ -152,12 +115,6 @@ export const putAuthorController = async (req: Request, res: Response) => {
       data: authorUpdated
     } as ResponseBuilder)
   } catch (error: Error | any) {
-    const validationError = handlerValidationError(error)
-
-    if (validationError) {
-      return res.status(400).json(validationError)
-    }
-
     const errorBuilder = handlerErrorsBuilder(error)
 
     logger.error(`update author controller | ID: ${req.params.id} | error:`, {
@@ -172,18 +129,6 @@ export const putAuthorController = async (req: Request, res: Response) => {
 export const deleteAuthorController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
-
-    if (!validateUuidv4(id)) {
-      const error = new ResponseBuilder({
-        status: 400,
-        code: 'error.validation',
-        message: 'ID inválido'
-      })
-
-      logger.error('delete author controller | error:', { error })
-
-      return res.status(error.status).json(error)
-    }
 
     await deleteAuthorService(id)
 

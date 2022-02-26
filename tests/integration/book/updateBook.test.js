@@ -69,7 +69,7 @@ describe('Test integration: Update Book', () => {
     it('400, Should return validation error path param', async () => {
       const response = await agent.put('/book/id').expect(400)
 
-      expect(response.body.message).toBe('ID inválido')
+      expect(response.body.message).toBe('ID precisa ser um uuid válido')
     })
 
     it('400, Should return validation error property', async () => {
@@ -115,8 +115,9 @@ describe('Test integration: Update Book', () => {
       const response = await agent.put(`/book/${uuid}`).send(book).expect(400)
 
       expect(response.body.code).toBe('error.validation')
-      expect(response.body.message).toBe(
-        'É necessário informar pelo menos um autor'
+      expect(response.body.message).toBe('Erro de validação dos campos')
+      expect(response.body.data).toContain(
+        'O array de autores precisa ter pelo menos um autor'
       )
     })
 
