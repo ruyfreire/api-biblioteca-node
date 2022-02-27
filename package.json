@@ -8,6 +8,7 @@
   "scripts": {
     "start": "ts-node-dev --exit-child src/index.ts",
     "test": "env-cmd -f .env.test jest --verbose --forceExit --detectOpenHandles --maxWorkers=1",
+    "test:ci": "jest --verbose --forceExit --detectOpenHandles --maxWorkers=1",
     "build": "tsc",
     "lint": "eslint --fix src/**/*.ts",
     "prettier": "prettier --write src/**/*.ts",
