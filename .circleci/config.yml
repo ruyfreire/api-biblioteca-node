@@ -13,8 +13,10 @@ jobs:
 
     steps:
       - checkout
+      - node/install-packages:
+          pkg-manager: yarn
       - run:
-          command: npm run test:ci
+          command: yarn test:ci
           name: Run tests
 
 workflows:
