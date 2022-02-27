@@ -1,6 +1,7 @@
 import { Author } from '.prisma/client'
 import { prismaClient } from '../../prisma'
-import { handlerErrorsPrisma } from '../../utils/HandlerErrorsPrisma'
+import { handlerErrorsBuilder } from '../../utils/ResponseBuilder'
+import { logger } from '../../utils/Logger'
 
 export interface ICreateAuthor {
   name: string
@@ -16,13 +17,15 @@ export const createAuthorService = async (
 
     return author
   } catch (error: any) {
-    const errorPrisma = handlerErrorsPrisma(error)
+    const defaultError = 'Erro para criar novo autor'
+    const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
-    if (errorPrisma) {
-      throw errorPrisma
-    }
+    logger.error('create author service | error:', {
+      error: errorBuilder,
+      originalError: error
+    })
 
-    throw new Error('Erro para criar novo autor')
+    throw errorBuilder
   }
 }
 
@@ -32,18 +35,20 @@ export const getAllAuthorsService = async (): Promise<Author[]> => {
 
     return authors
   } catch (error: any) {
-    const errorPrisma = handlerErrorsPrisma(error)
+    const defaultError = 'Erro para buscar lista de autores no banco'
+    const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
-    if (errorPrisma) {
-      throw errorPrisma
-    }
+    logger.error('get all authors service | error:', {
+      error: errorBuilder,
+      originalError: error
+    })
 
-    throw new Error('Erro para buscar lista de autores no banco')
+    throw errorBuilder
   }
 }
 
 export const getAuthorByIdService = async (
-  id: number
+  id: string
 ): Promise<Author | null> => {
   try {
     const author = await prismaClient.author.findFirst({
@@ -54,19 +59,21 @@ export const getAuthorByIdService = async (
 
     return author
   } catch (error) {
-    const errorPrisma = handlerErrorsPrisma(error)
+    const defaultError = 'Erro para buscar ID do autor no banco'
+    const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
-    if (errorPrisma) {
-      throw errorPrisma
-    }
+    logger.error(`get author by id service | ID: ${id} | error:`, {
+      error: errorBuilder,
+      originalError: error
+    })
 
-    throw new Error('Erro para buscar ID do autor no banco')
+    throw errorBuilder
   }
 }
 
 export const putAuthorService = async (
   author: ICreateAuthor,
-  id: number
+  id: string
 ): Promise<Author> => {
   try {
     const authorUpdated = await prismaClient.author.update({
@@ -78,17 +85,19 @@ export const putAuthorService = async (
 
     return authorUpdated
   } catch (error) {
-    const errorPrisma = handlerErrorsPrisma(error)
+    const defaultError = 'Erro para atualizar autor no banco'
+    const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
-    if (errorPrisma) {
-      throw errorPrisma
-    }
+    logger.error(`put author service | ID: ${id} | error:`, {
+      error: errorBuilder,
+      originalError: error
+    })
 
-    throw new Error('Erro para atualizar autor no banco')
+    throw errorBuilder
   }
 }
 
-export const deleteAuthorService = async (id: number): Promise<Author> => {
+export const deleteAuthorService = async (id: string): Promise<Author> => {
   try {
     const authorDeleted = await prismaClient.author.delete({
       where: {
@@ -96,14 +105,24 @@ export const deleteAuthorService = async (id: number): Promise<Author> => {
       }
     })
 
+    await prismaClient.book.deleteMany({
+      where: {
+        authors: {
+          none: {}
+        }
+      }
+    })
+
     return authorDeleted
   } catch (error) {
-    const errorPrisma = handlerErrorsPrisma(error)
+    const defaultError = 'Erro para deletar autor no banco'
+    const errorBuilder = handlerErrorsBuilder(error, defaultError)
 
-    if (errorPrisma) {
-      throw errorPrisma
-    }
+    logger.error(`delete author service | ID: ${id} | error:`, {
+      error: errorBuilder,
+      originalError: error
+    })
 
-    throw new Error('Erro para deletar autor no banco')
+    throw errorBuilder
   }
 }

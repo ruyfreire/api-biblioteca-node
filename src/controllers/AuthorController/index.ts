@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+
 import {
   createAuthorService,
   deleteAuthorService,
@@ -7,48 +8,36 @@ import {
   ICreateAuthor,
   putAuthorService
 } from '../../services/AuthorService'
-import { schemaCreateAuthor } from '../../utils/Validators/authorValidator'
-import { handlerValidationError } from '../../utils/Validators/handlerValidation'
+import {
+  ResponseBuilder,
+  handlerErrorsBuilder
+} from '../../utils/ResponseBuilder'
+import { logger } from '../../utils/Logger'
 
 export const createAuthorController = async (req: Request, res: Response) => {
   try {
     const author = req.body as ICreateAuthor
 
-    if (!author) {
-      return res.status(400).json({
-        code: 'error',
-        message: 'author não foi enviado'
-      })
-    }
-
-    await schemaCreateAuthor.validate(author)
-
     const newAuthor = await createAuthorService(author)
+
+    logger.info(
+      `create author controller | Autor criado com sucesso | ID: ${newAuthor.id}`
+    )
 
     return res.status(201).json({
       code: 'success',
       message: 'Autor criado com sucesso',
-      author: newAuthor
-    })
+      data: newAuthor
+    } as ResponseBuilder)
   } catch (error: Error | any) {
-    const validationError = handlerValidationError(error)
+    const errorBuilder = handlerErrorsBuilder(error)
 
-    if (validationError) {
-      return res.status(400).json(validationError)
-    }
-
-    if (error.status) {
-      return res.status(error.status).json({
-        code: error.code,
-        message: error.message,
-        data: error.data || ''
-      })
-    }
-
-    return res.status(500).json({
-      code: 'error',
-      message: error.message
+    logger.error('create author controller | error:', {
+      error: errorBuilder,
+      originalError: error
     })
+
+    return res.status(errorBuilder.status).json(errorBuilder)
   }
 }
 
@@ -56,24 +45,22 @@ export const getAllAuthorsController = async (req: Request, res: Response) => {
   try {
     const authors = await getAllAuthorsService()
 
+    logger.info('get all authors controller | Autores retornados com sucesso')
+
     return res.status(200).json({
       code: 'success',
       message: 'Listagem com todos os autores',
-      authors
-    })
+      data: authors
+    } as ResponseBuilder)
   } catch (error: Error | any) {
-    if (error.status) {
-      return res.status(error.status).json({
-        code: error.code,
-        message: error.message,
-        data: error.data || ''
-      })
-    }
+    const errorBuilder = handlerErrorsBuilder(error)
 
-    return res.status(500).json({
-      code: 'error',
-      message: error.message
+    logger.error('get all authors controller | error:', {
+      error: errorBuilder,
+      originalError: error
     })
+
+    return res.status(errorBuilder.status).json(errorBuilder)
   }
 }
 
@@ -81,40 +68,33 @@ export const getAuthorByIdController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
 
-    if (!Number(id)) {
-      return res.status(400).json({
-        code: 'error',
-        message: 'ID inválido'
-      })
-    }
-
-    const author = await getAuthorByIdService(Number(id))
+    const author = await getAuthorByIdService(id)
 
     if (!author) {
+      logger.warn(`get author by id | Autor não encontrado | ID: ${id}`)
+
       return res.status(404).json({
-        code: 'error',
+        code: 'error.notFound',
         message: 'Autor não encontrado'
-      })
+      } as ResponseBuilder)
     }
+
+    logger.info(`get author by id | Autor retornado com sucesso | ID: ${id}`)
 
     return res.status(200).json({
       code: 'success',
       message: 'Autor encontrado',
-      author
-    })
+      data: author
+    } as ResponseBuilder)
   } catch (error: Error | any) {
-    if (error.status) {
-      return res.status(error.status).json({
-        code: error.code,
-        message: error.message,
-        data: error.data || ''
-      })
-    }
+    const errorBuilder = handlerErrorsBuilder(error)
 
-    return res.status(500).json({
-      code: 'error',
-      message: error.message
+    logger.error(`get author by id | ID: ${req.params.id} | error:`, {
+      error: errorBuilder,
+      originalError: error
     })
+
+    return res.status(errorBuilder.status).json(errorBuilder)
   }
 }
 
@@ -123,41 +103,26 @@ export const putAuthorController = async (req: Request, res: Response) => {
     const { id } = req.params
     const author = req.body as ICreateAuthor
 
-    if (!Number(id)) {
-      return res.status(400).json({
-        code: 'error',
-        message: 'ID inválido'
-      })
-    }
+    const authorUpdated = await putAuthorService(author, id)
 
-    await schemaCreateAuthor.validate(author)
+    logger.info(
+      `update author controller | Autor atualizado com sucesso | ID: ${id}`
+    )
 
-    const authorUpdated = await putAuthorService(author, Number(id))
-
-    return res.status(201).json({
+    return res.status(200).json({
       code: 'success',
       message: 'Autor atualizado com sucesso',
-      author: authorUpdated
-    })
+      data: authorUpdated
+    } as ResponseBuilder)
   } catch (error: Error | any) {
-    const validationError = handlerValidationError(error)
+    const errorBuilder = handlerErrorsBuilder(error)
 
-    if (validationError) {
-      return res.status(400).json(validationError)
-    }
-
-    if (error.status) {
-      return res.status(error.status).json({
-        code: error.code,
-        message: error.message,
-        data: error.data || ''
-      })
-    }
-
-    return res.status(500).json({
-      code: 'error',
-      message: error.message
+    logger.error(`update author controller | ID: ${req.params.id} | error:`, {
+      error: errorBuilder,
+      originalError: error
     })
+
+    return res.status(errorBuilder.status).json(errorBuilder)
   }
 }
 
@@ -165,32 +130,24 @@ export const deleteAuthorController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params
 
-    if (!Number(id)) {
-      return res.status(400).json({
-        code: 'error',
-        message: 'ID inválido'
-      })
-    }
+    await deleteAuthorService(id)
 
-    const authorDeleted = await deleteAuthorService(Number(id))
+    logger.info(
+      `delete author controller | Autor deletado com sucesso | ID: ${id}`
+    )
 
-    return res.status(201).json({
+    return res.status(200).json({
       code: 'success',
-      message: 'Autor deletado com sucesso',
-      author: authorDeleted
-    })
+      message: 'Autor deletado com sucesso'
+    } as ResponseBuilder)
   } catch (error: Error | any) {
-    if (error.status) {
-      return res.status(error.status).json({
-        code: error.code,
-        message: error.message,
-        data: error.data || ''
-      })
-    }
+    const errorBuilder = handlerErrorsBuilder(error)
 
-    return res.status(500).json({
-      code: 'error',
-      message: error.message
+    logger.error(`delete author controller | ID: ${req.params.id} | error:`, {
+      error: errorBuilder,
+      originalError: error
     })
+
+    return res.status(errorBuilder.status).json(errorBuilder)
   }
 }

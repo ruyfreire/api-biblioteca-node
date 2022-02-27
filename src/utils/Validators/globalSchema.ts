@@ -4,7 +4,7 @@ import { object, setLocale } from 'yup'
 setLocale({
   mixed: {
     notType: 'O campo [${path}] precisa ser do tipo [${type}]',
-    required: 'O campo [${path}] é obrigatório'
+    required: 'Campo obrigatório: ${path}'
   },
   object: {
     noUnknown: 'Campos desconhecidos: [${unknown}]'
@@ -13,7 +13,11 @@ setLocale({
     min: 'O campo [${path}] precisa ter no mínimo ${min} caracteres',
     max: 'O campo [${path}] precisa ter no máximo ${max} caracteres',
     email: 'O campo [${path}] precisa ser um email válido',
-    url: 'O campo [${path}] precisa ser uma URL válida'
+    url: 'O campo [${path}] precisa ser uma URL válida',
+    uuid: 'O campo [${path}] precisa ser um uuid válido'
+  },
+  array: {
+    min: 'O array [${path}] precisa ter no mínimo ${min} item'
   }
 })
 

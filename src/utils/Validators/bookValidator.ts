@@ -1,21 +1,26 @@
 import { NextFunction, Request, Response } from 'express'
-import { SchemaOf, string, ValidationError } from 'yup'
+import { SchemaOf, string, array, ValidationError } from 'yup'
 
-import { ICreateAuthor } from '../../services/AuthorService'
+import { ICreateBook } from '../../services/BookService'
 import { logger } from '../Logger'
 import { ResponseBuilder } from '../ResponseBuilder'
 import { GlobalSchema } from './globalSchema'
 
-export const schemaCreateAuthor: SchemaOf<ICreateAuthor> = GlobalSchema.shape({
-  name: string().min(2).max(100).required()
+const schemaCreateBook: SchemaOf<ICreateBook> = GlobalSchema.shape({
+  name: string().min(3).max(100).required(),
+  summary: string().min(6).max(500).required(),
+  authors: array()
+    .of(string().uuid().required())
+    .min(1, 'O array de autores precisa ter pelo menos um autor')
+    .required()
 })
 
-export const validatorAuthor = (
+export const validatorBook = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  schemaCreateAuthor
+  schemaCreateBook
     .validate(req.body, {
       abortEarly: false
     })
@@ -28,7 +33,7 @@ export const validatorAuthor = (
         data: error.errors
       })
 
-      logger.error('author validator | error:', {
+      logger.error('book validator | error:', {
         error: errorBuilder,
         originalError: error
       })
