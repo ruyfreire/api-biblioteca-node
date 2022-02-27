@@ -1,7 +1,20 @@
-version: '2.1'
+version: 2.1
 orbs:
-  jest: blimmer/jest@x.y.z
+  node: circleci/node@4.7.0
+
+jobs:
+  build_and_test:
+    docker:
+      - image: cimg/node:17.2.0
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn
+      - run:
+          command: yarn test
+          name: Run tests
+
 workflows:
-  test:
+  on_commit:
     jobs:
-      - jest/test
+      - build_and_test
