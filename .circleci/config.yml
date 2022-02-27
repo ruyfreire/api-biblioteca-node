@@ -1,6 +1,6 @@
 version: 2.1
 jobs:
-  tests:
+  build:
     docker:
       - image: cimg/base:stable
     steps:
