@@ -5,5 +5,5 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - run: npm install
-      - run: npm run test
+      - run: yarn install
+      - run: yarn test
