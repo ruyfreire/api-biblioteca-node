@@ -1,7 +1,13 @@
-import { PrismaClient } from '.prisma/client'
+import { PrismaClient, Prisma } from '.prisma/client'
 
-const prismaClient = new PrismaClient({
-  log: ['query', 'info', 'warn', 'error']
-})
+const configClient: Prisma.PrismaClientOptions = {}
+
+const { NODE_ENV } = process.env
+
+if (NODE_ENV !== 'test') {
+  configClient.log = ['query', 'info', 'warn', 'error']
+}
+
+const prismaClient = new PrismaClient(configClient)
 
 export { prismaClient }

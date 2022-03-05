@@ -1,20 +1,16 @@
-import express from 'express'
-import cors from 'cors'
-import { Routes } from './routes'
+import { Server } from './server'
+import { logger } from './utils/Logger'
 
-const app = express()
+const port = process.env.PORT || 3000
+const server = new Server(port)
 
-app.use(
-  cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
+server
+  .start()
+  .then(() => {
+    logger.debug('----------------------------------------')
+    logger.debug(`\tServidor rodando na porta ${port}`)
+    logger.debug('----------------------------------------')
   })
-)
-
-app.use(express.json())
-
-app.use(Routes)
-
-app.listen(3000, () => {
-  console.log('Servidor rodando na porta 3000 🚀')
-})
+  .catch((error) => {
+    logger.error('Start server error:', { error })
+  })
