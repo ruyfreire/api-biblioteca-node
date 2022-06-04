@@ -1,0 +1,61 @@
+openapi: 3.0.0
+
+info:
+  title: Biblioteca API
+  description: Biblioteca para cadastrar, listar ou alterar livros e autores
+  version: 0.0.1
+
+servers:
+  - url: http://localhost:3000
+    description: Local
+
+paths:
+  /author:
+    get:
+      tags:
+        - Author
+      summary: Listar autores
+      description: Retorna a lista de todos os autores cadastrados
+      responses:
+        '200':
+          description: Resposta com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    $ref: '#/components/schemas/ResponseCode'
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Author'
+
+components:
+  schemas:
+    ResponseCode:
+      type: string
+      description: Códigos de resposta da API
+      enum:
+        - success
+        - error.validation
+        - error.internal
+        - error.notFound
+        - error.notAuthorized
+        - error.database.internal
+        - error.database.unique
+        - error.database.notFound
+        - error.database.validation
+    Author:
+      type: object
+      description: Objeto autor
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Identificador único no formato uuid
+        name:
+          type: string
+          description: Nome completo do autor
