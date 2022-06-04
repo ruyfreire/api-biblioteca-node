@@ -6,5 +6,5 @@ logs
 .env
 .env.test
 *.db*
-package-lock.json
 coverage
+yarn.lock
