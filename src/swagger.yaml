@@ -11,43 +11,133 @@ servers:
 
 paths:
   /author:
-    get:
+    post:
       tags:
-        - Author
-      summary: Listar autores
-      description: Retorna a lista de todos os autores cadastrados
+        - Autor
+      summary: Criar um novo autor
+      requestBody:
+        $ref: '#/components/requestBodies/AuthorCreate'
       responses:
-        '200':
-          description: Resposta com sucesso
+        '201':
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   code:
-                    $ref: '#/components/schemas/ResponseCode'
+                    $ref: '#/components/codes/CodeSuccess'
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Author'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    get:
+      tags:
+        - Autor
+      summary: Listar autores
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    $ref: '#/components/codes/CodeSuccess'
                   message:
                     type: string
                   data:
                     type: array
                     items:
                       $ref: '#/components/schemas/Author'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /author/{id}:
+    get:
+      tags:
+        - Autor
+      summary: Buscar autor por ID
+      parameters:
+        - $ref: '#/components/parameters/AuthorId'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    $ref: '#/components/codes/CodeSuccess'
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Author'
+        '404':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    $ref: '#/components/codes/CodeNotFound'
+                  message:
+                    type: string
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    put:
+      tags:
+        - Autor
+      summary: Editar autor por ID
+      parameters:
+        - $ref: '#/components/parameters/AuthorId'
+      requestBody:
+        $ref: '#/components/requestBodies/AuthorCreate'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    $ref: '#/components/codes/CodeSuccess'
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Author'
+        '400':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      tags:
+        - Autor
+      summary: Deletar autor por ID
+      parameters:
+        - $ref: '#/components/parameters/AuthorId'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    $ref: '#/components/codes/CodeSuccess'
+                  message:
+                    type: string
+        '500':
+          $ref: '#/components/responses/InternalError'
 
 components:
   schemas:
-    ResponseCode:
-      type: string
-      description: Códigos de resposta da API
-      enum:
-        - success
-        - error.validation
-        - error.internal
-        - error.notFound
-        - error.notAuthorized
-        - error.database.internal
-        - error.database.unique
-        - error.database.notFound
-        - error.database.validation
     Author:
       type: object
       description: Objeto autor
@@ -59,3 +149,115 @@ components:
         name:
           type: string
           description: Nome completo do autor
+    ResponseCodes:
+      description: Códigos retornados pela API
+      oneOf:
+        - $ref: '#/components/codes/CodeSuccess'
+        - $ref: '#/components/codes/CodeValidation'
+        - $ref: '#/components/codes/CodeUnauthorized'
+        - $ref: '#/components/codes/CodeNotFound'
+        - $ref: '#/components/codes/CodeDatabaseError'
+        - $ref: '#/components/codes/CodeInternalError'
+
+  parameters:
+    AuthorId:
+      name: id
+      in: path
+      description: ID do usuário
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  requestBodies:
+    AuthorCreate:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+
+  responses:
+    ValidationError:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                $ref: '#/components/codes/CodeValidation'
+              message:
+                type: string
+              data:
+                type: array
+                items:
+                  type: string
+    InternalError:
+      content:
+        application/json:
+          schema:
+            type: object
+            description: Objeto de erro interno
+            properties:
+              id_error:
+                type: string
+                format: uuid
+              code:
+                oneOf:
+                  - $ref: '#/components/codes/CodeInternalError'
+                  - $ref: '#/components/codes/CodeDatabaseError'
+              status:
+                type: number
+              message:
+                type: string
+              data:
+                anyOf:
+                  - type: string
+                  - type: integer
+                  - type: array
+                    items: {}
+                  - type: object
+                nullable: true
+
+  codes:
+    CodeSuccess:
+      type: string
+      description: Operação com sucesso
+      enum:
+        - success
+
+    CodeValidation:
+      type: string
+      description: Erro de validação
+      enum:
+        - error.validation
+
+    CodeNotFound:
+      type: string
+      description: Não encontrado
+      enum:
+        - error.notFound
+
+    CodeUnauthorized:
+      type: string
+      description: Não autorizado
+      enum:
+        - error.notAuthorized
+
+    CodeDatabaseError:
+      type: string
+      description: Erros de banco de dados
+      enum:
+        - error.database.internal
+        - error.database.unique
+        - error.database.notFound
+        - error.database.validation
+
+    CodeInternalError:
+      type: string
+      description: Erro genérico interno
+      enum:
+        - error.internal
