@@ -4,7 +4,6 @@ CREATE TABLE "authors" (
     "name" VARCHAR(255) NOT NULL,
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" TIMESTAMPTZ(6),
 
     CONSTRAINT "author_id" PRIMARY KEY ("id")
 );
@@ -16,7 +15,6 @@ CREATE TABLE "books" (
     "summary" VARCHAR(600) NOT NULL,
     "created_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
-    "deleted_at" TIMESTAMPTZ(6),
 
     CONSTRAINT "book_id" PRIMARY KEY ("id")
 );

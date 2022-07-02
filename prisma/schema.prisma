@@ -11,8 +11,7 @@ model authors {
   id          String        @id(map: "author_id") @db.Uuid
   name        String        @unique(map: "unique_author_name") @db.VarChar(255)
   created_at  DateTime?     @default(now()) @db.Timestamptz(6)
-  updated_at  DateTime?     @default(now()) @db.Timestamptz(6)
-  deleted_at  DateTime?     @db.Timestamptz(6)
+  updated_at  DateTime?     @default(now()) @updatedAt @db.Timestamptz(6)
   author_book author_book[]
 }
 
@@ -20,9 +19,8 @@ model books {
   id          String        @id(map: "book_id") @db.Uuid
   name        String        @unique(map: "unique_book_name") @db.VarChar(255)
   summary     String        @db.VarChar(600)
-  created_at  DateTime?     @default(now()) @db.Timestamptz(6)
+  created_at  DateTime?     @default(now()) @updatedAt @db.Timestamptz(6)
   updated_at  DateTime?     @default(now()) @db.Timestamptz(6)
-  deleted_at  DateTime?     @db.Timestamptz(6)
   author_book author_book[]
 }
 
