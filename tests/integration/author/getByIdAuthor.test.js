@@ -27,7 +27,7 @@ describe('Test integration: Get by id Author', () => {
         name: 'Author name'
       }
 
-      const createdAuthor = await prismaClient.author.create({
+      const createdAuthor = await prismaClient.authors.create({
         data: author
       })
 
@@ -59,7 +59,7 @@ describe('Test integration: Get by id Author', () => {
       const uuid = uuidv4()
 
       jest
-        .spyOn(prismaClient.author, 'findFirst')
+        .spyOn(prismaClient.authors, 'findFirst')
         .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.get(`/author/${uuid}`).expect(500)

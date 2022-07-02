@@ -26,7 +26,7 @@ describe('Test integration: Get all Authors', () => {
         name: 'Author name'
       }
 
-      await prismaClient.author.create({ data: author })
+      await prismaClient.authors.create({ data: author })
 
       const response = await agent.get('/author').expect(200)
 
@@ -37,7 +37,7 @@ describe('Test integration: Get all Authors', () => {
   describe('Error cases', () => {
     it('500, Should return internal error', async () => {
       jest
-        .spyOn(prismaClient.author, 'findMany')
+        .spyOn(prismaClient.authors, 'findMany')
         .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.get('/author').expect(500)

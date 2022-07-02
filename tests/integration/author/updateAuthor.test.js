@@ -30,7 +30,7 @@ describe('Test integration: Update Author', () => {
         name: 'Author updated'
       }
 
-      const createdAuthor = await prismaClient.author.create({ data: author })
+      const createdAuthor = await prismaClient.authors.create({ data: author })
       const response = await agent
         .put(`/author/${createdAuthor.id}`)
         .send(updateAuthor)
@@ -86,7 +86,7 @@ describe('Test integration: Update Author', () => {
       }
 
       jest
-        .spyOn(prismaClient.author, 'update')
+        .spyOn(prismaClient.authors, 'update')
         .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent

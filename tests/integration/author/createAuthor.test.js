@@ -46,7 +46,7 @@ describe('Test integration: Create Author', () => {
         name: 'Repeat Author name'
       }
 
-      await prismaClient.author.create({ data: author })
+      await prismaClient.authors.create({ data: author })
       const response = await agent.post('/author').send(author).expect(400)
 
       expect(response.body.code).toBe('error.database.unique')
@@ -60,7 +60,7 @@ describe('Test integration: Create Author', () => {
       }
 
       jest
-        .spyOn(prismaClient.author, 'create')
+        .spyOn(prismaClient.authors, 'create')
         .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.post('/author').send(author).expect(500)

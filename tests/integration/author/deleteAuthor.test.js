@@ -27,7 +27,7 @@ describe('Test integration: Delete author', () => {
         name: 'Author name'
       }
 
-      const createdAuthor = await prismaClient.author.create({ data: author })
+      const createdAuthor = await prismaClient.authors.create({ data: author })
 
       const response = await agent
         .delete(`/author/${createdAuthor.id}`)
@@ -59,7 +59,7 @@ describe('Test integration: Delete author', () => {
       const uuid = uuidv4()
 
       jest
-        .spyOn(prismaClient.author, 'delete')
+        .spyOn(prismaClient.authors, 'delete')
         .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.delete(`/author/${uuid}`).expect(500)
