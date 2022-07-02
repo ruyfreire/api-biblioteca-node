@@ -28,7 +28,7 @@ describe('Test integration: Get by id Book', () => {
         summary: 'Summary book'
       }
 
-      const createdBook = await prismaClient.book.create({
+      const createdBook = await prismaClient.books.create({
         data: mockedBook
       })
 
@@ -57,7 +57,7 @@ describe('Test integration: Get by id Book', () => {
       const uuid = uuidv4()
 
       jest
-        .spyOn(prismaClient.book, 'findFirst')
+        .spyOn(prismaClient.books, 'findFirst')
         .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.get(`/book/${uuid}`).expect(500)

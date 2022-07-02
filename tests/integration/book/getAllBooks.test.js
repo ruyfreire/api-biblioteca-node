@@ -27,7 +27,7 @@ describe('Test integration: Get all Books', () => {
         summary: 'Summary book'
       }
 
-      await prismaClient.book.create({ data: book })
+      await prismaClient.books.create({ data: book })
 
       const response = await agent.get('/book').expect(200)
 
@@ -38,7 +38,7 @@ describe('Test integration: Get all Books', () => {
   describe('Error cases', () => {
     it('500, Should return internal error', async () => {
       jest
-        .spyOn(prismaClient.book, 'findMany')
+        .spyOn(prismaClient.books, 'findMany')
         .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.get('/book').expect(500)

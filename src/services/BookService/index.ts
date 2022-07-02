@@ -1,4 +1,6 @@
-import { Book, Author } from '.prisma/client'
+import { v4 as uuidV4 } from 'uuid'
+
+import { books, authors } from '.prisma/client'
 import { prismaClient } from '../../prisma'
 import { ResponseBuilder } from '../../utils/ResponseBuilder'
 import { handlerErrorsBuilder } from '../../utils/ResponseBuilder'
@@ -10,19 +12,32 @@ export interface ICreateBook {
   authors: string[]
 }
 
+interface IBookOriginalResponse extends Pick<books, 'id' | 'name' | 'summary'> {
+  author_book: {
+    authors: Pick<authors, 'id' | 'name'>
+  }[]
+}
+
+interface IBookFormattedResponse
+  extends Pick<books, 'id' | 'name' | 'summary'> {
+  authors: Pick<authors, 'id' | 'name'>[]
+}
+
+interface BookResponse extends Pick<books, 'id' | 'name' | 'summary'> {}
+
 const formatResponseBook = (
-  books: Book & {
-    authors: {
-      author: Author
-    }[]
+  books: IBookOriginalResponse
+): IBookFormattedResponse => {
+  const { author_book, ...bookProps } = books
+
+  return {
+    ...bookProps,
+    authors: books.author_book.map((current) => current.authors)
   }
-): Book & { authors: Author[] } => ({
-  ...books,
-  authors: books.authors.map((current) => current.author)
-})
+}
 
 export class BookService {
-  async create(book: ICreateBook): Promise<Book> {
+  async create(book: ICreateBook): Promise<BookResponse> {
     try {
       const authorList = book?.authors || []
 
@@ -35,7 +50,7 @@ export class BookService {
         })
       }
 
-      const authorsFound = await prismaClient.author.findMany({
+      const authorsFound = await prismaClient.authors.findMany({
         where: {
           id: {
             in: authorList
@@ -54,13 +69,14 @@ export class BookService {
         })
       }
 
-      const newBook = await prismaClient.book.create({
+      const newBook = await prismaClient.books.create({
         data: {
+          id: uuidV4(),
           name: book.name,
           summary: book.summary,
-          authors: {
+          author_book: {
             create: authorList.map((authorId) => ({
-              author: {
+              authors: {
                 connect: {
                   id: authorId
                 }
@@ -68,10 +84,18 @@ export class BookService {
             }))
           }
         },
-        include: {
-          authors: {
+        select: {
+          id: true,
+          name: true,
+          summary: true,
+          author_book: {
             select: {
-              author: true
+              authors: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
             }
           }
         }
@@ -93,13 +117,21 @@ export class BookService {
     }
   }
 
-  async getAll(): Promise<Book[]> {
+  async getAll(): Promise<BookResponse[]> {
     try {
-      const books = await prismaClient.book.findMany({
-        include: {
-          authors: {
+      const books = await prismaClient.books.findMany({
+        select: {
+          id: true,
+          name: true,
+          summary: true,
+          author_book: {
             select: {
-              author: true
+              authors: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
             }
           }
         }
@@ -121,16 +153,24 @@ export class BookService {
     }
   }
 
-  async getById(id: string): Promise<Book | null> {
+  async getById(id: string): Promise<BookResponse | null> {
     try {
-      const book = await prismaClient.book.findFirst({
+      const book = await prismaClient.books.findFirst({
         where: {
           id
         },
-        include: {
-          authors: {
+        select: {
+          id: true,
+          name: true,
+          summary: true,
+          author_book: {
             select: {
-              author: true
+              authors: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
             }
           }
         }
@@ -156,7 +196,7 @@ export class BookService {
     }
   }
 
-  async update(id: string, book: ICreateBook): Promise<Book> {
+  async update(id: string, book: ICreateBook): Promise<BookResponse> {
     try {
       const authorList = book?.authors || []
 
@@ -169,7 +209,7 @@ export class BookService {
         })
       }
 
-      const authorsFound = await prismaClient.author.findMany({
+      const authorsFound = await prismaClient.authors.findMany({
         where: {
           id: {
             in: authorList
@@ -188,43 +228,51 @@ export class BookService {
         })
       }
 
-      const updatedBook = await prismaClient.book.update({
+      const updatedBook = await prismaClient.books.update({
         where: {
           id
         },
         data: {
           name: book.name,
           summary: book.summary,
-          authors: {
+          author_book: {
             connectOrCreate: authorList.map((authorId) => ({
               create: {
-                author: {
+                authors: {
                   connect: {
                     id: authorId
                   }
                 }
               },
               where: {
-                authorId_bookId: {
-                  bookId: id,
-                  authorId
+                author_id_book_id: {
+                  book_id: id,
+                  author_id: authorId
                 }
               }
             })),
             deleteMany: [
               {
-                authorId: {
+                author_id: {
                   notIn: authorList
                 },
-                bookId: id
+                book_id: id
               }
             ]
           }
         },
-        include: {
-          authors: {
+        select: {
+          id: true,
+          name: true,
+          summary: true,
+          author_book: {
             select: {
-              author: true
+              authors: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
             }
           }
         }
@@ -246,9 +294,9 @@ export class BookService {
     }
   }
 
-  async delete(id: string): Promise<Book> {
+  async delete(id: string): Promise<BookResponse> {
     try {
-      const deletedBook = await prismaClient.book.delete({
+      const deletedBook = await prismaClient.books.delete({
         where: {
           id
         }

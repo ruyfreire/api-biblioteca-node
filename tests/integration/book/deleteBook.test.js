@@ -28,7 +28,7 @@ describe('Test integration: Delete book', () => {
         summary: 'Summary book'
       }
 
-      const createdBook = await prismaClient.book.create({ data: book })
+      const createdBook = await prismaClient.books.create({ data: book })
 
       const response = await agent.delete(`/book/${createdBook.id}`).expect(200)
 
@@ -58,7 +58,7 @@ describe('Test integration: Delete book', () => {
       const uuid = uuidv4()
 
       jest
-        .spyOn(prismaClient.book, 'delete')
+        .spyOn(prismaClient.books, 'delete')
         .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.delete(`/book/${uuid}`).expect(500)

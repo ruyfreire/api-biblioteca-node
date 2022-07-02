@@ -23,7 +23,7 @@ describe('Test integration: Create Book', () => {
 
   describe('Success cases', () => {
     it('201, Should create book success', async () => {
-      const authorCreated = await prismaClient.author.create({
+      const authorCreated = await prismaClient.authors.create({
         data: { name: 'Author name' }
       })
 
@@ -62,7 +62,7 @@ describe('Test integration: Create Book', () => {
         summary: 'Summary book'
       }
 
-      const createdBook = await prismaClient.book.create({
+      const createdBook = await prismaClient.books.create({
         data: {
           name: book.name,
           summary: book.summary,
@@ -127,7 +127,7 @@ describe('Test integration: Create Book', () => {
     })
 
     it('500, Should return internal error', async () => {
-      const authorCreated = await prismaClient.author.create({
+      const authorCreated = await prismaClient.authors.create({
         data: { name: 'Author name' }
       })
 
@@ -138,7 +138,7 @@ describe('Test integration: Create Book', () => {
       }
 
       jest
-        .spyOn(prismaClient.book, 'create')
+        .spyOn(prismaClient.books, 'create')
         .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.post('/book').send(book).expect(500)
