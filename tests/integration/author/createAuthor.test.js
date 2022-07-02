@@ -49,8 +49,8 @@ describe('Test integration: Create Author', () => {
 
       await prismaClient.authors.create({
         data: {
-          id: chance.guid({ version: 4 }),
-          name: author.name
+          ...author,
+          id: chance.guid({ version: 4 })
         }
       })
       const response = await agent.post('/author').send(author).expect(400)

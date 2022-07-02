@@ -1,10 +1,13 @@
 import request from 'supertest'
+import Chance from 'chance'
+
 import { Server } from '../../../src/server'
 import { prismaClient } from '../../../src/prisma'
-import { Prisma } from '@prisma/client'
+import { fixtures } from '../../utils'
 
 let app
 let agent
+const chance = new Chance()
 
 describe('Test integration: Get all Authors', () => {
   beforeAll(async () => {
@@ -22,15 +25,18 @@ describe('Test integration: Get all Authors', () => {
 
   describe('Success cases', () => {
     it('200, Should get all author success', async () => {
-      const author = {
-        name: 'Author name'
-      }
+      const author = fixtures.author.create()
 
-      await prismaClient.authors.create({ data: author })
+      await prismaClient.authors.create({
+        data: {
+          ...author,
+          id: chance.guid({ version: 4 })
+        }
+      })
 
       const response = await agent.get('/author').expect(200)
 
-      expect(response.body.data[0]).toMatchObject(author)
+      expect(response.body.data.length).toBeGreaterThan(0)
     })
   })
 

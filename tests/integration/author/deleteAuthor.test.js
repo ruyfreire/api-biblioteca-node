@@ -1,11 +1,13 @@
 import request from 'supertest'
-import { v4 as uuidv4 } from 'uuid'
+import Chance from 'chance'
 
 import { Server } from '../../../src/server'
 import { prismaClient } from '../../../src/prisma'
+import { fixtures } from '../../utils'
 
 let app
 let agent
+const chance = new Chance()
 
 describe('Test integration: Delete author', () => {
   beforeAll(async () => {
@@ -23,11 +25,14 @@ describe('Test integration: Delete author', () => {
 
   describe('Success cases', () => {
     it('200, Should delete author', async () => {
-      const author = {
-        name: 'Author name'
-      }
+      const author = fixtures.author.create()
 
-      const createdAuthor = await prismaClient.authors.create({ data: author })
+      const createdAuthor = await prismaClient.authors.create({
+        data: {
+          ...author,
+          id: chance.guid({ version: 4 })
+        }
+      })
 
       const response = await agent
         .delete(`/author/${createdAuthor.id}`)
@@ -46,7 +51,7 @@ describe('Test integration: Delete author', () => {
     })
 
     it('400, Should return author not found', async () => {
-      const uuid = uuidv4()
+      const uuid = chance.guid({ version: 4 })
       const response = await agent.delete(`/author/${uuid}`).expect(404)
 
       expect(response.body.code).toBe('error.database.notFound')
@@ -56,7 +61,7 @@ describe('Test integration: Delete author', () => {
     })
 
     it('500, Should return internal error', async () => {
-      const uuid = uuidv4()
+      const uuid = chance.guid({ version: 4 })
 
       jest
         .spyOn(prismaClient.authors, 'delete')
