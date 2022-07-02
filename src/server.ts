@@ -1,10 +1,8 @@
 import express, { Express } from 'express'
 import { Server as httpServer } from 'http'
 import cors from 'cors'
-import path from 'path'
 const swaggerUi = require('swagger-ui-express')
-const YAML = require('yamljs')
-const swaggerDocument = YAML.load(path.resolve(__dirname, 'swagger.yaml'))
+const swaggerDocument = require('./swagger.json')
 
 import { Routes } from './routes'
 
