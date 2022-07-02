@@ -13,7 +13,8 @@
     "lint": "eslint --fix src/**/*.ts",
     "prettier": "prettier --write src/**/*.ts",
     "prisma:studio": "prisma studio",
-    "migrate:dev": "prisma migrate dev"
+    "prisma:migrate_dev": "prisma migrate dev",
+    "prisma:pull_db": "prisma db pull"
   },
   "dependencies": {
     "@prisma/client": "^3.14.0",
