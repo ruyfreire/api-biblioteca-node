@@ -6,12 +6,14 @@ jobs:
   test:
     docker:
       - image: cimg/node:17.2.0
+
       - image: cimg/postgres:14.2
+        environment:
+          POSTGRES_USER: biblioteca
+          POSTGRES_PASSWORD: biblioteca123
+          POSTGRES_DB: test_biblioteca
 
     environment:
-      POSTGRES_USER: biblioteca
-      POSTGRES_PASSWORD: biblioteca123
-      POSTGRES_DB: test_biblioteca
       DATABASE_URL: "postgresql://biblioteca:biblioteca123@localhost:5432/test_biblioteca?schema=public"
       PORT: 3000
 
