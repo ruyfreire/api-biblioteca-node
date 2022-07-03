@@ -4,7 +4,6 @@ logs
 *.log
 .eslintcache
 .env
-.env.test
 *.db*
 coverage
 yarn.lock
