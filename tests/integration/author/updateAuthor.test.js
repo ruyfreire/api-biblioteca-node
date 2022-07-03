@@ -3,6 +3,7 @@ import request from 'supertest'
 import { Server } from '../../../src/server'
 import { prismaClient } from '../../../src/prisma'
 import { fixtures } from '../../utils'
+import { createAuthorService } from '../../../src/services/AuthorService'
 
 let app
 let agent
@@ -23,19 +24,15 @@ describe('Test integration: Update Author', () => {
 
   describe('Success cases', () => {
     it('200, Should update author success', async () => {
-      const authorDatabase = fixtures.author.createOnDatabase()
-      const { id, ...updateAuthor } = authorDatabase
-      updateAuthor.name = 'Author updated'
+      const { id, ...author } = await createAuthorService(
+        fixtures.author.create()
+      )
+      author.name = fixtures.author.create().name
 
-      await prismaClient.authors.create({ data: authorDatabase })
-
-      const response = await agent
-        .put(`/author/${id}`)
-        .send(updateAuthor)
-        .expect(200)
+      const response = await agent.put(`/author/${id}`).send(author).expect(200)
 
       expect(response.body.message).toBe('Autor atualizado com sucesso')
-      expect(response.body.data).toMatchObject(updateAuthor)
+      expect(response.body.data).toMatchObject(author)
     })
   })
 

@@ -1,11 +1,10 @@
-import Chance from 'chance'
-import { CreateAuthorDatabase } from '../../../../src/services/AuthorService'
+import { faker } from '@faker-js/faker'
 
-const chance = new Chance()
+import { CreateAuthorDatabase } from '../../../../src/services/AuthorService'
 
 export const createOnDatabase = (
   data?: CreateAuthorDatabase
 ): CreateAuthorDatabase => ({
-  id: data?.id || chance.guid({ version: 4 }),
-  name: data?.name || chance.name()
+  id: data?.id || faker.datatype.uuid(),
+  name: data?.name || faker.name.findName()
 })

@@ -12,6 +12,10 @@ export interface ICreateBook {
   authors: string[]
 }
 
+export interface CreateBookDatabase extends ICreateBook {
+  id: string
+}
+
 interface IBookOriginalResponse extends Pick<books, 'id' | 'name' | 'summary'> {
   author_book: {
     authors: Pick<authors, 'id' | 'name'>

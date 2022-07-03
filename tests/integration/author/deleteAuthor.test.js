@@ -3,6 +3,7 @@ import request from 'supertest'
 import { Server } from '../../../src/server'
 import { prismaClient } from '../../../src/prisma'
 import { fixtures } from '../../utils'
+import { createAuthorService } from '../../../src/services/AuthorService'
 
 let app
 let agent
@@ -23,10 +24,7 @@ describe('Test integration: Delete author', () => {
 
   describe('Success cases', () => {
     it('200, Should delete author', async () => {
-      const author = fixtures.author.createOnDatabase()
-      await prismaClient.authors.create({
-        data: author
-      })
+      const author = await createAuthorService(fixtures.author.create())
 
       const response = await agent.delete(`/author/${author.id}`).expect(200)
 

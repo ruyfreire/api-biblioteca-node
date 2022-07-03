@@ -2,6 +2,7 @@ const request = require('supertest')
 
 const { Server } = require('../../../src/server')
 const { prismaClient } = require('../../../src/prisma')
+import { createAuthorService } from '../../../src/services/AuthorService'
 import { fixtures } from '../../utils'
 
 let app
@@ -23,10 +24,7 @@ describe('Test integration: Get by id Author', () => {
 
   describe('Success cases', () => {
     it('200, Should return found author', async () => {
-      const author = fixtures.author.createOnDatabase()
-      await prismaClient.authors.create({
-        data: author
-      })
+      const author = await createAuthorService(fixtures.author.create())
 
       const response = await agent.get(`/author/${author.id}`).expect(200)
 

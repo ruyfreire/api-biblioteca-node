@@ -1,15 +1,22 @@
 import request from 'supertest'
+
 import { Server } from '../../../src/server'
 import { prismaClient } from '../../../src/prisma'
-import { Prisma } from '@prisma/client'
+import { fixtures } from '../../utils'
+import { BookService } from '../../../src/services/BookService'
+import { createAuthorService } from '../../../src/services/AuthorService'
 
 let app
 let agent
+let author
+const bookService = new BookService()
 
 describe('Test integration: Get all Books', () => {
   beforeAll(async () => {
     app = await new Server().start()
     agent = request.agent(app)
+
+    author = await createAuthorService(fixtures.author.create())
   })
 
   beforeEach(() => {
@@ -22,16 +29,17 @@ describe('Test integration: Get all Books', () => {
 
   describe('Success cases', () => {
     it('200, Should get all book success', async () => {
-      const book = {
-        name: 'Book name',
-        summary: 'Summary book'
-      }
+      const book = fixtures.book.createOnDatabase({ authors: [author.id] })
 
-      await prismaClient.books.create({ data: book })
+      const bookCreated = await bookService.create(book)
 
       const response = await agent.get('/book').expect(200)
 
-      expect(response.body.data[0]).toMatchObject(book)
+      expect(response.body.data.length).toBeGreaterThan(0)
+      expect(response.body.data).toContainEqual({
+        ...bookCreated,
+        authors: [author]
+      })
     })
   })
 

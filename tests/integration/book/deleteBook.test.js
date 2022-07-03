@@ -1,16 +1,22 @@
 import request from 'supertest'
-import { v4 as uuidv4 } from 'uuid'
 
 import { Server } from '../../../src/server'
 import { prismaClient } from '../../../src/prisma'
+import { fixtures } from '../../utils'
+import { createAuthorService } from '../../../src/services/AuthorService'
+import { BookService } from '../../../src/services/BookService'
 
 let app
 let agent
+let author
+const bookService = new BookService()
 
 describe('Test integration: Delete book', () => {
   beforeAll(async () => {
     app = await new Server().start()
     agent = request.agent(app)
+
+    author = await createAuthorService(fixtures.author.create())
   })
 
   beforeEach(() => {
@@ -23,14 +29,11 @@ describe('Test integration: Delete book', () => {
 
   describe('Success cases', () => {
     it('200, Should delete book', async () => {
-      const book = {
-        name: 'Book name',
-        summary: 'Summary book'
-      }
+      const book = fixtures.book.createOnDatabase({ authors: [author.id] })
 
-      const createdBook = await prismaClient.books.create({ data: book })
+      const bookCreated = await bookService.create(book)
 
-      const response = await agent.delete(`/book/${createdBook.id}`).expect(200)
+      const response = await agent.delete(`/book/${bookCreated.id}`).expect(200)
 
       expect(response.body.message).toBe('Livro deletado com sucesso')
     })
@@ -44,9 +47,9 @@ describe('Test integration: Delete book', () => {
     })
 
     it('400, Should return book not found', async () => {
-      const uuid = uuidv4()
+      const { id } = fixtures.book.createOnDatabase()
 
-      const response = await agent.delete(`/book/${uuid}`).expect(404)
+      const response = await agent.delete(`/book/${id}`).expect(404)
 
       expect(response.body.code).toBe('error.database.notFound')
       expect(response.body.message).toBe(
@@ -55,13 +58,13 @@ describe('Test integration: Delete book', () => {
     })
 
     it('500, Should return internal error', async () => {
-      const uuid = uuidv4()
+      const { id } = fixtures.book.createOnDatabase()
 
       jest
         .spyOn(prismaClient.books, 'delete')
         .mockImplementation(() => Promise.reject(new Error()))
 
-      const response = await agent.delete(`/book/${uuid}`).expect(500)
+      const response = await agent.delete(`/book/${id}`).expect(500)
 
       expect(response.body.code).toBe('error.database.internal')
       expect(response.body.message).toBe('Erro para deletar livro no banco')

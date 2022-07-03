@@ -1,8 +1,7 @@
-import Chance from 'chance'
+import { faker } from '@faker-js/faker'
+
 import { ICreateAuthor } from '../../../../src/services/AuthorService'
 
-const chance = new Chance()
-
 export const create = (data?: ICreateAuthor): ICreateAuthor => ({
-  name: data?.name || chance.name()
+  name: data?.name || faker.name.findName()
 })

@@ -43,12 +43,9 @@ describe('Test integration: Create Author', () => {
     })
 
     it('400, Should return already existing author', async () => {
-      const authorDatabase = fixtures.author.createOnDatabase()
-      const { id, ...author } = authorDatabase
+      const author = fixtures.author.create()
 
-      await prismaClient.authors.create({
-        data: authorDatabase
-      })
+      await agent.post('/author').send(author)
       const response = await agent.post('/author').send(author).expect(400)
 
       expect(response.body.code).toBe('error.database.unique')
