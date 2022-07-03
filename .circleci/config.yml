@@ -9,6 +9,9 @@ jobs:
       - image: cimg/postgres:14.2
 
     environment:
+      POSTGRES_USER: biblioteca
+      POSTGRES_PASSWORD: biblioteca123
+      POSTGRES_DB: biblioteca
       DATABASE_URL: "postgresql://biblioteca:biblioteca123@localhost:5432/test_biblioteca?schema=public"
       PORT: 3000
 
