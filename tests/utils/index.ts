@@ -1,3 +1,1 @@
-import * as fixtures from './fixtures'
-
-export { fixtures }
+export * as fixtures from './fixtures'

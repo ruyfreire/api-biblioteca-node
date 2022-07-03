@@ -1,5 +1,4 @@
 import request from 'supertest'
-import Chance from 'chance'
 
 import { Server } from '../../../src/server'
 import { prismaClient } from '../../../src/prisma'
@@ -8,7 +7,6 @@ import { fixtures } from '../../utils'
 
 let app
 let agent
-const chance = new Chance()
 
 describe('Test integration: Create Author', () => {
   beforeAll(async () => {
@@ -45,13 +43,11 @@ describe('Test integration: Create Author', () => {
     })
 
     it('400, Should return already existing author', async () => {
-      const author = fixtures.author.create()
+      const authorDatabase = fixtures.author.createOnDatabase()
+      const { id, ...author } = authorDatabase
 
       await prismaClient.authors.create({
-        data: {
-          ...author,
-          id: chance.guid({ version: 4 })
-        }
+        data: authorDatabase
       })
       const response = await agent.post('/author').send(author).expect(400)
 

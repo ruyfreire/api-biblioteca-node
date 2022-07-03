@@ -1,8 +1,8 @@
 const request = require('supertest')
-import { v4 as uuidv4 } from 'uuid'
 
 const { Server } = require('../../../src/server')
 const { prismaClient } = require('../../../src/prisma')
+import { fixtures } from '../../utils'
 
 let app
 let agent
@@ -23,17 +23,12 @@ describe('Test integration: Get by id Author', () => {
 
   describe('Success cases', () => {
     it('200, Should return found author', async () => {
-      const author = {
-        name: 'Author name'
-      }
-
-      const createdAuthor = await prismaClient.authors.create({
+      const author = fixtures.author.createOnDatabase()
+      await prismaClient.authors.create({
         data: author
       })
 
-      const response = await agent
-        .get(`/author/${createdAuthor.id}`)
-        .expect(200)
+      const response = await agent.get(`/author/${author.id}`).expect(200)
 
       expect(response.body.data).toMatchObject(author)
     })
@@ -48,21 +43,21 @@ describe('Test integration: Get by id Author', () => {
     })
 
     it('400, Should return author not found', async () => {
-      const uuid = uuidv4()
-      const response = await agent.get(`/author/${uuid}`).expect(404)
+      const { id } = fixtures.author.createOnDatabase()
+      const response = await agent.get(`/author/${id}`).expect(404)
 
       expect(response.body.code).toBe('error.notFound')
       expect(response.body.message).toBe('Autor não encontrado')
     })
 
     it('500, Should return internal error', async () => {
-      const uuid = uuidv4()
+      const { id } = fixtures.author.createOnDatabase()
 
       jest
         .spyOn(prismaClient.authors, 'findFirst')
         .mockImplementation(() => Promise.reject(new Error()))
 
-      const response = await agent.get(`/author/${uuid}`).expect(500)
+      const response = await agent.get(`/author/${id}`).expect(500)
 
       expect(response.body.code).toBe('error.database.internal')
       expect(response.body.message).toBe(

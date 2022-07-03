@@ -1,3 +1,1 @@
-import * as author from './author'
-
-export { author }
+export * as author from './author'

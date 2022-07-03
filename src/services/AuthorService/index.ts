@@ -9,11 +9,11 @@ export interface ICreateAuthor {
   name: string
 }
 
-interface AuthorResponse extends Pick<authors, 'id' | 'name'> {}
+export interface CreateAuthorDatabase extends Pick<authors, 'id' | 'name'> {}
 
 export const createAuthorService = async (
   newAuthor: ICreateAuthor
-): Promise<AuthorResponse> => {
+): Promise<CreateAuthorDatabase> => {
   try {
     const author = await prismaClient.authors.create({
       data: {
@@ -40,7 +40,9 @@ export const createAuthorService = async (
   }
 }
 
-export const getAllAuthorsService = async (): Promise<AuthorResponse[]> => {
+export const getAllAuthorsService = async (): Promise<
+  CreateAuthorDatabase[]
+> => {
   try {
     const authors = await prismaClient.authors.findMany({
       select: {
@@ -65,7 +67,7 @@ export const getAllAuthorsService = async (): Promise<AuthorResponse[]> => {
 
 export const getAuthorByIdService = async (
   id: string
-): Promise<AuthorResponse | null> => {
+): Promise<CreateAuthorDatabase | null> => {
   try {
     const author = await prismaClient.authors.findFirst({
       where: {
@@ -94,7 +96,7 @@ export const getAuthorByIdService = async (
 export const putAuthorService = async (
   author: ICreateAuthor,
   id: string
-): Promise<AuthorResponse> => {
+): Promise<CreateAuthorDatabase> => {
   try {
     const authorUpdated = await prismaClient.authors.update({
       where: {
@@ -123,7 +125,7 @@ export const putAuthorService = async (
 
 export const deleteAuthorService = async (
   id: string
-): Promise<AuthorResponse> => {
+): Promise<CreateAuthorDatabase> => {
   try {
     const authorDeleted = await prismaClient.authors.delete({
       where: {
