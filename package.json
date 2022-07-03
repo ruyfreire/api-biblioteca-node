@@ -16,6 +16,7 @@
     "prettier": "prettier --write src/**/*.ts",
     "prisma:studio": "prisma studio",
     "prisma:migrate_dev": "prisma migrate dev",
+    "prisma:generate": "prisma generate",
     "prisma:pull_db": "prisma db pull"
   },
   "dependencies": {
