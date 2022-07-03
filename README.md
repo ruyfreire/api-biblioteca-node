@@ -5,13 +5,18 @@
 
 ## Descrição
 
-🏗️ **`EM DESENVOLVIMENTO`** 🏗️
+API de biblioteca NodeJS para fins de estudo
 
-API de biblioteca sendo desenvolvida em NodeJS para fins de estudo
+## Dependências
+- Node >= 14.18
+- NPM >= 6.14
+- Docker >= 20.10
+- docker-compose >= 1.29
 
 ## Funcionalidades
 
 - [x] Construir CRUD de `autor` e `livro`, com os mesmos atributos contidos no projeto da primeira biblioteca
+- [x] Incluir swagger
 - [ ] Incluir novos campos no cadastro de autor e livro
 - [ ] Incluir sistema de empréstimo de livros
 - [ ] Incluir notificações via socket 
@@ -29,31 +34,26 @@ API de biblioteca sendo desenvolvida em NodeJS para fins de estudo
 - [jest](https://github.com/facebook/jest)
 - [ESlint](https://github.com/eslint/eslint)
 - [Prettier](https://github.com/prettier/prettier)
+- [Faker](https://github.com/faker-js/faker)
 
 ## Diretórios
 
 ```bash
-├── prisma # Migrações, models prisma, banco de dados (SQlite)
+├── prisma # Migrações, models prisma, banco de dados
 ├── src
 │   ├── controllers # Controladores das rotas
 │   ├── prisma # Instancia e configurações do prisma client
 │   ├── routes # Rotas
 │   ├── services # Serviços das rotas
-│   └── utils # Utilitários para logs, respostas http, validadores Yup, etc...
-├── tests
-│   ├── integration # Testes de integração das rotas
-│   ├── utils # Utilitários para os testes
-│   └── jest-setup.js # Config jest durante os testes
-├── index.ts # Arquivo inicial do projeto
-└── server.ts # Configuração do servidor
+│   ├── utils # Utilitários para logs, respostas http, validadores Yup, etc...
+│   ├── index.ts # Arquivo inicial do projeto
+│   ├── server.ts # Configuração do servidor
+│   └── swagger.json # Documentação da API usando swagger
+└── tests
+    ├── integration # Testes de integração das rotas
+    ├── utils # Utilitários para os testes
+    └── jest-setup.js # Config jest durante os testes
 ```
-
-## Instalar
-
-```bash
-yarn install
-```
-\* Recomendado usar yarn para aproveitar o **yarn.lock**
 
 ## Configurar ENV
 
@@ -61,56 +61,70 @@ Criar arquivo `.env` com as infos:
 
 | Nome | Padrão | Obrigatório | Descrição
 | --- | --- | --- | ---
-| `DATABASE_URL` | `null` | `Sim` | Nome do arquivo de banco de dados
+| `DATABASE_URL` | `null` | `Sim` | String de conexão com o banco de dados
 | `PORT` | `3000` | `Não` | Porta que o servidor vai rodar
 
-\* O Banco de dados configurado no projeto é `SQLite`
+\* O Banco de dados configurado no projeto é `Postgres`
 
 *Exemplo:*
 ```bash
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="postgresql://username:password@hostname:5432/database?schema=public"
 PORT=3000
 ```
 
+## Docker / Banco de dados
+
+```bash
+# Subir container com banco de dados Postgres
+docker-compose up
+```
+
 ## Rodar projeto
+\* Recomendado usar `npm` para aproveitar o `package-lock.json` e evitar comportamentos inesperados
 
 ```bash
 # Instalar dependências
-yarn install
+npm install
 
-# Rodar migrações do banco Sqlite
-yarn migrate:dev
+# Rodar migrações do banco de dados
+npm run prisma:migrate_dev
+
+# Carregar models do banco de dados no prisma
+npm run prisma:generate
 
 # Iniciar servidor
-yarn start
+npm run start
 ```
 
-## Rodar Prisma Studio `Visualizar dados em banco`
+## Rodar Prisma Studio
+\* Visualizar dados do banco de dados com o prisma
 
 ```bash
-yarn prisma:studio
+npm run prisma:studio
 ```
 
 ## Build
 
 ```bash
-yarn build
+# Build e gerar pasta dist
+npm run build
 ```
 
 ## Rodar testes
 
 ```bash
-yarn test
+# Container do banco de dados precisa estar rodando
+npm run test
 ```
 
 ## Rodar ESlint
 
 ```bash
-yarn lint
+npm run lint
 ```
 
 ## Rodar Prettier
 
 ```bash
-yarn prettier
+npm run prettier
 ```
