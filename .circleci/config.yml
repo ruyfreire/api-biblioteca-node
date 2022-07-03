@@ -6,17 +6,18 @@ jobs:
   test:
     docker:
       - image: cimg/node:17.2.0
+      - image: cimg/postgres:14.2.0
 
     environment:
-      DATABASE_URL: 'file:./test.db'
+      DATABASE_URL: "postgresql://biblioteca:biblioteca123@localhost:5432/test_biblioteca?schema=public"
       PORT: 3000
 
     steps:
       - checkout
       - node/install-packages:
-          pkg-manager: yarn
+          pkg-manager: npm
       - run:
-          command: yarn test:ci
+          command: npm run test:ci
           name: Run tests
 
 workflows:
