@@ -9,6 +9,7 @@
     "start": "ts-node-dev --exit-child src/index.ts",
     "test": "env-cmd -f .env.test jest --verbose --forceExit --detectOpenHandles --maxWorkers=1",
     "test:migrate": "env-cmd -f .env.test prisma migrate dev && prisma generate",
+    "test:migrate:ci": "prisma migrate dev && prisma generate",
     "test:ci": "jest --verbose --forceExit --detectOpenHandles --maxWorkers=1",
     "build": "tsc",
     "lint": "eslint --fix src/**/*.ts",
