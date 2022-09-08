@@ -1,7 +1,7 @@
-import { Server } from './server'
-import { logger } from './utils/Logger'
+import { Server } from './src/server'
+import { logger } from './src/utils/Logger'
 
-const port = process.env.PORT || 3000
+const port = process.env.PORT || 3001
 const server = new Server(port)
 
 server
