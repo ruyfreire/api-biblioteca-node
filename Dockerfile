@@ -7,6 +7,10 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 COPY tsconfig.json ./
 
+# Correção para rodar comando do prisma no node 16-alpine
+# https://github.com/prisma/prisma/issues/14073#issuecomment-1348534199
+RUN apk add --update --no-cache openssl1.1-compat
+
 # Instalar Pacotes
 RUN npm install
 
