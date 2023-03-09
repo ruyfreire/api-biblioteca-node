@@ -1,4 +1,6 @@
-import { Author } from '.prisma/client'
+import { v4 as uuidV4 } from 'uuid'
+
+import { authors } from '.prisma/client'
 import { prismaClient } from '../../prisma'
 import { handlerErrorsBuilder } from '../../utils/ResponseBuilder'
 import { logger } from '../../utils/Logger'
@@ -7,12 +9,21 @@ export interface ICreateAuthor {
   name: string
 }
 
+export interface CreateAuthorDatabase extends Pick<authors, 'id' | 'name'> {}
+
 export const createAuthorService = async (
   newAuthor: ICreateAuthor
-): Promise<Author> => {
+): Promise<CreateAuthorDatabase> => {
   try {
-    const author = await prismaClient.author.create({
-      data: newAuthor
+    const author = await prismaClient.authors.create({
+      data: {
+        id: uuidV4(),
+        name: newAuthor.name
+      },
+      select: {
+        id: true,
+        name: true
+      }
     })
 
     return author
@@ -29,9 +40,16 @@ export const createAuthorService = async (
   }
 }
 
-export const getAllAuthorsService = async (): Promise<Author[]> => {
+export const getAllAuthorsService = async (): Promise<
+  CreateAuthorDatabase[]
+> => {
   try {
-    const authors = await prismaClient.author.findMany()
+    const authors = await prismaClient.authors.findMany({
+      select: {
+        id: true,
+        name: true
+      }
+    })
 
     return authors
   } catch (error: any) {
@@ -49,11 +67,15 @@ export const getAllAuthorsService = async (): Promise<Author[]> => {
 
 export const getAuthorByIdService = async (
   id: string
-): Promise<Author | null> => {
+): Promise<CreateAuthorDatabase | null> => {
   try {
-    const author = await prismaClient.author.findFirst({
+    const author = await prismaClient.authors.findFirst({
       where: {
         id
+      },
+      select: {
+        id: true,
+        name: true
       }
     })
 
@@ -74,13 +96,17 @@ export const getAuthorByIdService = async (
 export const putAuthorService = async (
   author: ICreateAuthor,
   id: string
-): Promise<Author> => {
+): Promise<CreateAuthorDatabase> => {
   try {
-    const authorUpdated = await prismaClient.author.update({
+    const authorUpdated = await prismaClient.authors.update({
       where: {
         id
       },
-      data: author
+      data: author,
+      select: {
+        id: true,
+        name: true
+      }
     })
 
     return authorUpdated
@@ -97,17 +123,19 @@ export const putAuthorService = async (
   }
 }
 
-export const deleteAuthorService = async (id: string): Promise<Author> => {
+export const deleteAuthorService = async (
+  id: string
+): Promise<CreateAuthorDatabase> => {
   try {
-    const authorDeleted = await prismaClient.author.delete({
+    const authorDeleted = await prismaClient.authors.delete({
       where: {
         id
       }
     })
 
-    await prismaClient.book.deleteMany({
+    await prismaClient.books.deleteMany({
       where: {
-        authors: {
+        author_book: {
           none: {}
         }
       }

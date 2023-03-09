@@ -1,8 +1,9 @@
 import request from 'supertest'
-import { v4 as uuidv4 } from 'uuid'
 
 import { Server } from '../../../src/server'
 import { prismaClient } from '../../../src/prisma'
+import { fixtures } from '../../utils'
+import { createAuthorService } from '../../../src/services/AuthorService'
 
 let app
 let agent
@@ -23,21 +24,15 @@ describe('Test integration: Update Author', () => {
 
   describe('Success cases', () => {
     it('200, Should update author success', async () => {
-      const author = {
-        name: 'Author name'
-      }
-      const updateAuthor = {
-        name: 'Author updated'
-      }
+      const { id, ...author } = await createAuthorService(
+        fixtures.author.create()
+      )
+      author.name = fixtures.author.create().name
 
-      const createdAuthor = await prismaClient.author.create({ data: author })
-      const response = await agent
-        .put(`/author/${createdAuthor.id}`)
-        .send(updateAuthor)
-        .expect(200)
+      const response = await agent.put(`/author/${id}`).send(author).expect(200)
 
       expect(response.body.message).toBe('Autor atualizado com sucesso')
-      expect(response.body.data).toMatchObject(updateAuthor)
+      expect(response.body.data).toMatchObject(author)
     })
   })
 
@@ -50,28 +45,19 @@ describe('Test integration: Update Author', () => {
     })
 
     it('400, Should return validation error property', async () => {
-      const uuid = uuidv4()
+      const { id } = fixtures.author.createOnDatabase()
       const author = {}
 
-      const response = await agent
-        .put(`/author/${uuid}`)
-        .send(author)
-        .expect(400)
+      const response = await agent.put(`/author/${id}`).send(author).expect(400)
 
       expect(response.body.message).toBe('Erro de validação dos campos')
       expect(response.body.data).toContain('Campo obrigatório: name')
     })
 
     it('400, Should return author not found', async () => {
-      const uuid = uuidv4()
-      const author = {
-        name: 'Author name'
-      }
+      const { id, ...author } = fixtures.author.createOnDatabase()
 
-      const response = await agent
-        .put(`/author/${uuid}`)
-        .send(author)
-        .expect(404)
+      const response = await agent.put(`/author/${id}`).send(author).expect(404)
 
       expect(response.body.code).toBe('error.database.notFound')
       expect(response.body.message).toBe(
@@ -80,19 +66,13 @@ describe('Test integration: Update Author', () => {
     })
 
     it('500, Should return internal error', async () => {
-      const uuid = uuidv4()
-      const author = {
-        name: 'Author name'
-      }
+      const { id, ...author } = fixtures.author.createOnDatabase()
 
       jest
-        .spyOn(prismaClient.author, 'update')
+        .spyOn(prismaClient.authors, 'update')
         .mockImplementation(() => Promise.reject(new Error()))
 
-      const response = await agent
-        .put(`/author/${uuid}`)
-        .send(author)
-        .expect(500)
+      const response = await agent.put(`/author/${id}`).send(author).expect(500)
 
       expect(response.body.code).toBe('error.database.internal')
       expect(response.body.message).toBe('Erro para atualizar autor no banco')

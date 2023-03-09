@@ -1,16 +1,22 @@
 import request from 'supertest'
-import { v4 as uuidv4 } from 'uuid'
 
 import { Server } from '../../../src/server'
 import { prismaClient } from '../../../src/prisma'
+import { fixtures } from '../../utils'
+import { createAuthorService } from '../../../src/services/AuthorService'
+import { BookService } from '../../../src/services/BookService'
 
 let app
 let agent
+let author
+const bookService = new BookService()
 
 describe('Test integration: Create Book', () => {
   beforeAll(async () => {
     app = await new Server().start()
     agent = request.agent(app)
+
+    author = await createAuthorService(fixtures.author.create())
   })
 
   beforeEach(() => {
@@ -23,21 +29,13 @@ describe('Test integration: Create Book', () => {
 
   describe('Success cases', () => {
     it('201, Should create book success', async () => {
-      const authorCreated = await prismaClient.author.create({
-        data: { name: 'Author name' }
-      })
-
-      const book = {
-        name: 'Book name',
-        summary: 'Summary book',
-        authors: [authorCreated.id]
-      }
+      const book = fixtures.book.create({ authors: [author.id] })
 
       const response = await agent.post('/book').send(book).expect(201)
 
       const bookResponse = {
         ...book,
-        authors: [authorCreated]
+        authors: [author]
       }
 
       expect(response.body.data).toMatchObject(bookResponse)
@@ -46,9 +44,9 @@ describe('Test integration: Create Book', () => {
 
   describe('Error cases', () => {
     it('400, Should return validation error', async () => {
-      const book = {
-        name: 'Book name'
-      }
+      const { summary, ...book } = fixtures.book.create({
+        authors: [author.id]
+      })
 
       const response = await agent.post('/book').send(book).expect(400)
 
@@ -57,50 +55,20 @@ describe('Test integration: Create Book', () => {
     })
 
     it('400, Should return already existing book', async () => {
-      const book = {
-        name: 'Repeat book name',
-        summary: 'Summary book'
-      }
-
-      const createdBook = await prismaClient.book.create({
-        data: {
-          name: book.name,
-          summary: book.summary,
-          authors: {
-            create: {
-              author: {
-                create: { name: 'Author Repeat name' }
-              }
-            }
-          }
-        },
-        include: {
-          authors: {
-            select: {
-              authorId: true
-            }
-          }
-        }
+      const book = fixtures.book.create({
+        authors: [author.id]
       })
 
-      const repeatBook = {
-        ...book,
-        authors: [createdBook.authors[0].authorId]
-      }
-
-      const response = await agent.post('/book').send(repeatBook).expect(400)
+      await agent.post('/book').send(book)
+      const response = await agent.post('/book').send(book).expect(400)
 
       expect(response.body.code).toBe('error.database.unique')
       expect(response.body.message).toBe('Dados já existem no banco')
       expect(response.body.data).toEqual({ duplicate_fields: ['name'] })
     })
 
-    it('400, Should require authors list', async () => {
-      const book = {
-        name: 'Book name',
-        summary: 'Summary book',
-        authors: []
-      }
+    it('400, Should require authors list on validator schema', async () => {
+      const book = fixtures.book.create({ authors: [] })
 
       const response = await agent.post('/book').send(book).expect(400)
 
@@ -112,11 +80,7 @@ describe('Test integration: Create Book', () => {
     })
 
     it('400, Should return author not found', async () => {
-      const book = {
-        name: 'Book name',
-        summary: 'Summary book',
-        authors: [uuidv4()]
-      }
+      const book = fixtures.book.create()
 
       const response = await agent.post('/book').send(book).expect(400)
 
@@ -127,24 +91,25 @@ describe('Test integration: Create Book', () => {
     })
 
     it('500, Should return internal error', async () => {
-      const authorCreated = await prismaClient.author.create({
-        data: { name: 'Author name' }
-      })
-
-      const book = {
-        name: 'Book name',
-        summary: 'Summary book',
-        authors: [authorCreated.id]
-      }
+      const book = fixtures.book.create({ authors: [author.id] })
 
       jest
-        .spyOn(prismaClient.book, 'create')
+        .spyOn(prismaClient.books, 'create')
         .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.post('/book').send(book).expect(500)
 
       expect(response.body.code).toBe('error.database.internal')
       expect(response.body.message).toBe('Erro para criar novo livro')
+    })
+
+    it('Should require authors list on service', async () => {
+      const book = fixtures.book.create({ authors: [] })
+
+      await bookService.create(book).catch((error) => {
+        expect(error.code).toBe('error.validation')
+        expect(error.message).toBe('É necessário informar pelo menos um autor')
+      })
     })
   })
 })

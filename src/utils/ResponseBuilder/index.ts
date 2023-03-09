@@ -1,15 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Prisma } from '@prisma/client'
 
-interface IMetaError {
-  target: Array<string>
-  cause: string
-}
-
-interface IPrismaKnownError extends Prisma.PrismaClientKnownRequestError {
-  meta: IMetaError
-}
-
 export interface ResponseBuilderOptions {
   code:
     | 'success'
@@ -49,7 +40,7 @@ export const handlerErrorsBuilder = (
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     // P2002: Valor único que nao pode ser alterado
     if (error.code === 'P2002') {
-      const { meta } = error as IPrismaKnownError
+      const { meta } = error
       const { target = [] } = meta || {}
 
       return new ResponseBuilder({
@@ -64,7 +55,7 @@ export const handlerErrorsBuilder = (
 
     // P2025: Recurso não encontrado
     if (error.code === 'P2025') {
-      const { meta } = error as IPrismaKnownError
+      const { meta } = error
       const { cause = '' } = meta || {}
 
       return new ResponseBuilder({

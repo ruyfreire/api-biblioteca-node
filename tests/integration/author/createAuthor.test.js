@@ -1,6 +1,9 @@
 import request from 'supertest'
+
 import { Server } from '../../../src/server'
 import { prismaClient } from '../../../src/prisma'
+
+import { fixtures } from '../../utils'
 
 let app
 let agent
@@ -21,9 +24,7 @@ describe('Test integration: Create Author', () => {
 
   describe('Success cases', () => {
     it('201, Should create author success', async () => {
-      const author = {
-        name: 'Author name'
-      }
+      const author = fixtures.author.create()
 
       const response = await agent.post('/author').send(author).expect(201)
 
@@ -42,11 +43,9 @@ describe('Test integration: Create Author', () => {
     })
 
     it('400, Should return already existing author', async () => {
-      const author = {
-        name: 'Repeat Author name'
-      }
+      const author = fixtures.author.create()
 
-      await prismaClient.author.create({ data: author })
+      await agent.post('/author').send(author)
       const response = await agent.post('/author').send(author).expect(400)
 
       expect(response.body.code).toBe('error.database.unique')
@@ -55,12 +54,10 @@ describe('Test integration: Create Author', () => {
     })
 
     it('500, Should return internal error', async () => {
-      const author = {
-        name: 'Author name'
-      }
+      const author = fixtures.author.create()
 
       jest
-        .spyOn(prismaClient.author, 'create')
+        .spyOn(prismaClient.authors, 'create')
         .mockImplementation(() => Promise.reject(new Error()))
 
       const response = await agent.post('/author').send(author).expect(500)

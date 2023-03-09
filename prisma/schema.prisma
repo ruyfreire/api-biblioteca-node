@@ -1,40 +1,36 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-model Author {
-  id   String @id @default(uuid())
-  name String @unique
-
-  books AuthorAndBook[]
-
-  @@map("authors")
+model authors {
+  id          String        @id(map: "author_id") @db.Uuid
+  name        String        @unique(map: "unique_author_name") @db.VarChar(255)
+  created_at  DateTime?     @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime?     @default(now()) @updatedAt @db.Timestamptz(6)
+  author_book author_book[]
 }
 
-model Book {
-  id      String @id @default(uuid())
-  name    String @unique
-  summary String
-
-  authors AuthorAndBook[]
-
-  @@map("books")
+model books {
+  id          String        @id(map: "book_id") @db.Uuid
+  name        String        @unique(map: "unique_book_name") @db.VarChar(255)
+  summary     String        @db.VarChar(600)
+  created_at  DateTime?     @default(now()) @updatedAt @db.Timestamptz(6)
+  updated_at  DateTime?     @default(now()) @db.Timestamptz(6)
+  author_book author_book[]
 }
 
-model AuthorAndBook {
-  author   Author @relation(fields: [authorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  authorId String
-  book     Book   @relation(fields: [bookId], references: [id], onUpdate: Cascade, onDelete: Cascade)
-  bookId   String
+model author_book {
+  author_id String  @db.Uuid
+  book_id   String  @db.Uuid
+  authors   authors @relation(fields: [author_id], references: [id], onDelete: Cascade, map: "fk_author_id")
+  books     books   @relation(fields: [book_id], references: [id], onDelete: Cascade, map: "fk_book_id")
 
-  @@id([authorId, bookId])
-  @@map("author_book")
+  @@id([author_id, book_id])
+  @@index([author_id], map: "fki_fk_author_id")
+  @@index([book_id], map: "fki_fk_book_id")
 }
